@@ -77,23 +77,19 @@ const AdminPage = () => {
 
     eventSource.onmessage = (event) => {
       const { action, ticket } = JSON.parse(event.data);
-      // fix - for duplicates ignore -- TODO
       setTickets((prev) => {
-        switch (action) {
-          case "CREATE":
-            // Add new ticket to top
-            return [ticket, ...prev];
-          case "DELETE":
-            // Remove by ID
-            return prev.filter((t) => t.id !== ticket.id);
-          case "UPDATE":
-            // Find and replace the specific ticket
-            return prev.map((t) =>
-              t.id === ticket.id ? { ...t, ...ticket } : t,
-            );
-          default:
-            return prev;
+        if (action === "CREATE") {
+          const duplicate = prev.find((t) => t.id === ticket.id);
+          if (duplicate) return prev;
+          return [ticket, ...prev];
+        } else if (action === "DELETE") {
+          return prev.filter((t) => t.id !== ticket.id);
+        } else if (action === "UPDATE") {
+          return prev.map((t) =>
+            t.id === ticket.id ? { ...t, ...ticket } : t,
+          );
         }
+        return prev;
       });
     };
 
