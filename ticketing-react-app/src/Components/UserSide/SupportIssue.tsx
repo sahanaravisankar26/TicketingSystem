@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast, Bounce } from "react-toastify";
 
 const SupportIssue = ({ email }: { email: string }) => {
   const [issue, setIssue] = useState("");
@@ -25,14 +26,24 @@ const SupportIssue = ({ email }: { email: string }) => {
           issue,
           description: details,
           message: "",
-          state: "Pending..."
+          state: "Pending...",
         }),
       });
 
       const data = await result.json();
 
       if (!result.ok) {
-        alert(data.error || "Something went wrong");
+        toast.error(data.error || "Something went wrong", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
         setIsSubmitting(false);
         return;
       }
@@ -46,9 +57,21 @@ const SupportIssue = ({ email }: { email: string }) => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 5000);
-    } catch (error) {
-      console.error("Error submitting issue:", error);
-      alert("Failed to submit issue. Please try again.");
+    } catch (err) {
+      toast.error(
+        "Failed to submit issue due to " + err + ". Please try again.",
+        {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        },
+      );
     } finally {
       setIsSubmitting(false);
     }
