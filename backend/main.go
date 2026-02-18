@@ -75,7 +75,7 @@ func main() {
 	r.HandleFunc("/submit-issue", support.SendSupport(ticket_collection, ticketBroker))
 
 	// FETCH SUPPORT ISSUES
-	r.HandleFunc("/fetch-history", support.FetchSupport(ticket_collection, cluster))
+	r.HandleFunc("/fetch-history", support.FetchSupport(ticket_collection, cluster, ticketBroker))
     // r.HandleFunc("/fetch-all-tickets", support.FetchAllSupport(ticket_collection, cluster))
 	r.HandleFunc("/fetch-all-tickets", ticketBroker.ServeAdminSSE(cluster))
 
@@ -84,7 +84,7 @@ func main() {
 
     // UPDATE SUPPORT ISSUE
     r.HandleFunc("/update-support", support.UpdateSupport(ticket_collection, cluster, ticketBroker))
-	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster))
+	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster, ticketBroker))
 
 	fmt.Println("Server starting on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

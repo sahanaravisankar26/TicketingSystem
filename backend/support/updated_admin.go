@@ -16,7 +16,7 @@ type UpdateAdmin struct {
 	State   string `json:"state"`
 }
 
-func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster) http.HandlerFunc {
+func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		if r.Method == http.MethodOptions {
@@ -34,11 +34,18 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster) http.Han
 			return
 		}
 
-		query := "UPDATE `tickets`._default._default SET message = $1, state = $2 WHERE id = $3;"
-		_, err = cluster.Query(query, &gocb.QueryOptions{
+		query := "UPDATE `tickets`._default._default AS tickets SET message = $1, state = $2 WHERE id = $3 RETURNING tickets.*;"
+		res, err := cluster.Query(query, &gocb.QueryOptions{
 			PositionalParameters: []interface{}{update.Message, update.State, update.Id},
 			Adhoc:                true,
 		})
+
+		var tickets Issue
+		if err == nil && res.Next() {
+			res.Row(&tickets)
+			broker.Broadcast("UPDATE", tickets)
+			broker.NotifyUser(tickets.Email, "UPDATE", tickets)
+		}
 
 		if err != nil {
 			http.Error(w, "Update failed: "+err.Error(), http.StatusInternalServerError)

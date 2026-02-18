@@ -77,7 +77,7 @@ const AdminPage = () => {
 
     eventSource.onmessage = (event) => {
       const { action, ticket } = JSON.parse(event.data);
-
+      // fix - for duplicates ignore -- TODO
       setTickets((prev) => {
         switch (action) {
           case "CREATE":

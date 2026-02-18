@@ -31,8 +31,20 @@ const History = ({ email }: { email: string }) => {
 
     eventSource.onmessage = (event) => {
       try {
-        const newTicket = JSON.parse(event.data);
-        setTickets((prev) => [newTicket, ...prev]);
+        const data = JSON.parse(event.data);
+        console.log("Received Ticket Event:", data);
+        const { action, ticket } = data;
+        setTickets((prev) => {
+          if (!ticket.id) return prev;
+          if (action === "CREATE") {
+            const duplicate = prev.find((t) => t.id === ticket.id);
+            if (duplicate) return ticket;
+            return [ticket, ...prev];
+          } else if (action === "UPDATE") {
+            return prev.map((t) => (t.id === ticket.id ? ticket : t));
+          }
+          return prev;
+        });
       } catch (err) {
         console.error("Parse error:", err);
       }
@@ -175,7 +187,10 @@ const History = ({ email }: { email: string }) => {
                       />
                       <FaSearch
                         className="hover:cursor-pointer text-xl rounded-2xl"
-                        onClick={() => {setViewModal(true); setSelectedTicketId(ticket.id)}}
+                        onClick={() => {
+                          setViewModal(true);
+                          setSelectedTicketId(ticket.id);
+                        }}
                       />
                     </div>
                   </div>
@@ -220,8 +235,7 @@ const History = ({ email }: { email: string }) => {
           isOpen={viewModal}
           onClose={() => setViewModal(false)}
           message={
-            tickets.find((t) => t.id === selectedTicketId)?.message ||
-            ""
+            tickets.find((t) => t.id === selectedTicketId)?.message || ""
           }
         />
       </div>
