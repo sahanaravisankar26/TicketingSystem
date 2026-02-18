@@ -65,7 +65,7 @@ const SupportIssue = ({ email }: { email: string }) => {
         className="max-w-sm mx-auto space-y-4 mt-8 border p-3 rounded-lg shadow-2xl flex flex-col justify-center"
         onSubmit={handleSubmit}
       >
-        <h3 className="mb-4 text-2xl font-bold text-heading md:text-3xl lg:text-5xl">
+        <h3 className="mb-4 text-2xl text-center font-bold text-heading md:text-3xl lg:text-5xl">
           Submit{" "}
           <span className="text-transparent bg-clip-text bg-linear-to-r from-red-800 to-red-500">
             Your Issue
