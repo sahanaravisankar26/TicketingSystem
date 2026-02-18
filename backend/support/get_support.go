@@ -55,7 +55,7 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 			return
 		}
 
-		if err == nil {
+		if err == nil { // remove this - already made a check above
             for res.Next() {
                 var t Issue
                 if err := res.Row(&t); err == nil {
@@ -68,7 +68,7 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 
 		clientChannel := make(chan TicketEvent)
 		broker.mu.Lock()
-		if broker.Users[email] == nil {
+		if broker.Users[email] == nil { // fail safe (most probably won't need it)
             broker.Users[email] = make(map[chan TicketEvent]bool) // don't overwrite other open tabs for this user
         }
 		broker.Users[email][clientChannel] = true
@@ -114,9 +114,7 @@ type TicketResponse struct {
     Tickets []Issue `json:"tickets"`
 }
 
-// ... inside your handler ...
-
-// 2. Encode the wrapper instead of the raw slice
+Encode the wrapper instead of the raw slice
 json.NewEncoder(w).Encode(TicketResponse{
     Tickets: tickets,
 })

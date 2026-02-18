@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { CiEdit } from "react-icons/ci";
-import { MdDeleteForever } from "react-icons/md";
 import EditModal from "./Modals/EditModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { CiTimer } from "react-icons/ci";
 import { MdDone } from "react-icons/md";
-import { FaSearch } from "react-icons/fa";
+import { FaTrash, FaSearch } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
 import { toast, Bounce } from "react-toastify";
 
@@ -148,7 +147,7 @@ const History = ({ email }: { email: string }) => {
                         }}
                         className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm mr-2 hover:text-red-600"
                       />
-                      <MdDeleteForever
+                      <FaTrash
                         onClick={() => {
                           setDeleteModalOpen(true);
                           setSelectedTicketId(ticket.id);
@@ -188,19 +187,19 @@ const History = ({ email }: { email: string }) => {
                         : ticket.message.slice(0, 97) + "..."}
                     </p>
                     <div className="flex justify-between">
-                      <MdDeleteForever
-                        onClick={() => {
-                          setDeleteModalOpen(true);
-                          setSelectedTicketId(ticket.id);
-                        }}
-                        className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm hover:text-red-600 mr-2"
-                      />
                       <FaSearch
-                        className="hover:cursor-pointer text-xl rounded-2xl"
+                        className="hover:cursor-pointer text-xl rounded-2xl mr-2"
                         onClick={() => {
                           setViewModal(true);
                           setSelectedTicketId(ticket.id);
                         }}
+                      />
+                      <FaTrash
+                        onClick={() => {
+                          setDeleteModalOpen(true);
+                          setSelectedTicketId(ticket.id);
+                        }}
+                        className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm hover:text-red-600"
                       />
                     </div>
                   </div>
