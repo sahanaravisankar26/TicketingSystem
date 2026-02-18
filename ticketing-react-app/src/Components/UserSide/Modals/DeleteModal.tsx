@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast, Bounce } from "react-toastify";
 
 interface DeleteModalProps {
   isOpen: boolean;
@@ -36,7 +37,17 @@ const DeleteModal = ({
       onDeleteSuccess();
       onClose();
     } catch (err) {
-      console.log(err);
+      toast.error("Error on delete due to: " + err, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     } finally {
       setIsDeleting(false);
     }

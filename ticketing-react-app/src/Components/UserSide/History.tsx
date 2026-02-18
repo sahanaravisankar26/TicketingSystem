@@ -7,6 +7,7 @@ import { CiTimer } from "react-icons/ci";
 import { MdDone } from "react-icons/md";
 import { FaSearch } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
+import { toast, Bounce } from "react-toastify";
 
 interface Ticket {
   id: string;
@@ -32,7 +33,6 @@ const History = ({ email }: { email: string }) => {
     eventSource.onmessage = (event) => {
       try {
         const data = JSON.parse(event.data);
-        console.log("Received Ticket Event:", data);
         const { action, ticket } = data;
         setTickets((prev) => {
           if (!ticket.id) return prev;
@@ -46,7 +46,17 @@ const History = ({ email }: { email: string }) => {
           return prev;
         });
       } catch (err) {
-        console.error("Parse error:", err);
+        toast.error("Parse error:" + err, {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
       }
     };
 

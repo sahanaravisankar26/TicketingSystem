@@ -3,6 +3,8 @@ import "./App.css";
 import AdminLogin from "./Components/LoginSignup/AdminLogin";
 import LoginSignup from "./Components/LoginSignup/LoginSignup";
 import { Route, Routes } from "react-router-dom";
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   return (
@@ -15,6 +17,7 @@ function App() {
           <Route path="/admin-dashboard" element={<AdminDashboard />} /> 
         </Routes>
       </div>
+      <ToastContainer />
     </>
   );
 }

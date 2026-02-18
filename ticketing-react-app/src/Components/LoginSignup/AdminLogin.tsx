@@ -1,23 +1,38 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast, Bounce } from "react-toastify";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (username === import.meta.env.VITE_ADMIN && password === import.meta.env.VITE_PASSWORD) {
+  const handleLogin = (e) => {
+    e.preventDefault();
+    if (
+      username === import.meta.env.VITE_ADMIN &&
+      password === import.meta.env.VITE_PASSWORD
+    ) {
       // Redirect to Admin Dashboard
       navigate("/admin-dashboard");
     } else {
-      alert("Invalid Admin Credentials");
+      toast.error("Invalid Admin Credentials", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
   const gotoUser = () => {
     navigate("/sign-in");
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-red-100">
@@ -51,7 +66,15 @@ const AdminLogin = () => {
           >
             Login
           </button>
-          <p className="text-center text-sm text-gray-500 mt-2">If you're the user, <span onClick={gotoUser} className="text-orange-600 font-semibold hover:underline cursor-pointer">click here!</span></p>
+          <p className="text-center text-sm text-gray-500 mt-2">
+            If you're the user,{" "}
+            <span
+              onClick={gotoUser}
+              className="text-orange-600 font-semibold hover:underline cursor-pointer"
+            >
+              click here!
+            </span>
+          </p>
         </form>
       </div>
     </div>

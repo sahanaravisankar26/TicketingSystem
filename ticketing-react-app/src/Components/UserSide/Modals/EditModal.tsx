@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast, Bounce } from "react-toastify";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -8,7 +9,13 @@ interface EditModalProps {
   onUpdateSuccess: (newDesc: string) => void;
 }
 
-const EditModal = ({ isOpen, onClose, description, id, onUpdateSuccess }: EditModalProps) => {
+const EditModal = ({
+  isOpen,
+  onClose,
+  description,
+  id,
+  onUpdateSuccess,
+}: EditModalProps) => {
   const [value, setValue] = useState(description);
   const [isUpdating, setIsUpdating] = useState(false);
 
@@ -31,18 +38,27 @@ const EditModal = ({ isOpen, onClose, description, id, onUpdateSuccess }: EditMo
       if (!res.ok) {
         throw new Error("Failed to update the ticket");
       }
-      onUpdateSuccess(value)
+      onUpdateSuccess(value);
       onClose();
     } catch (err) {
-      console.log(err);
+      toast.error("Error on updating due to: " + err, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     } finally {
       setIsUpdating(false);
     }
-  }
+  };
 
-  if (!isOpen)
-    return null;
-  
+  if (!isOpen) return null;
+
   return (
     <>
       <div
@@ -80,7 +96,9 @@ const EditModal = ({ isOpen, onClose, description, id, onUpdateSuccess }: EditMo
                     d="M6 18 17.94 6M18 18 6.06 6"
                   />
                 </svg>
-                <span className="sr-only" onClick={onClose}>Close modal</span>
+                <span className="sr-only" onClick={onClose}>
+                  Close modal
+                </span>
               </button>
             </div>
 

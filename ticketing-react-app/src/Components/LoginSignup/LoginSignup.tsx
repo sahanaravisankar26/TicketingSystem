@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import UserPage from "../UserSide/UserPage";
 import { useNavigate } from "react-router-dom";
+import { toast, Bounce } from "react-toastify";
 
 const LoginSignup = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -10,11 +11,13 @@ const LoginSignup = () => {
 
   const gotoAdmin = () => {
     navigate("/admin-login");
-  }
+  };
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedInUser");
-    return savedUser !== undefined && savedUser !== null ? JSON.parse(savedUser) : null;
+    return savedUser !== undefined && savedUser !== null
+      ? JSON.parse(savedUser)
+      : null;
     // return null; // To debug
   });
 
@@ -45,7 +48,17 @@ const LoginSignup = () => {
       const data = await result.json();
 
       if (!result.ok) {
-        alert(data.error || "Something went wrong");
+        toast.error(data.error || "Something went wrong", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: false,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
         return;
       }
 
@@ -57,8 +70,17 @@ const LoginSignup = () => {
       setEmail("");
       setPassword("");
     } catch (error) {
-      console.log("Error is ", error);
-      alert("Error occured. " + error);
+      toast.error("Error is " + error, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     }
   };
 
@@ -132,7 +154,15 @@ const LoginSignup = () => {
             >
               {isLoginMode ? "Sign up" : "Login"}
             </button>
-            <p>If you're the admin, <span onClick={gotoAdmin} className="text-orange-600 font-semibold hover:underline cursor-pointer">click here!</span></p>
+            <p>
+              If you're the admin,{" "}
+              <span
+                onClick={gotoAdmin}
+                className="text-orange-600 font-semibold hover:underline cursor-pointer"
+              >
+                click here!
+              </span>
+            </p>
           </p>
         </form>
       </div>

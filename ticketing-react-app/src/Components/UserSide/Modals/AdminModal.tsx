@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { toast, Bounce } from "react-toastify";
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -15,7 +16,7 @@ const AdminModal = ({
   description,
   issue,
   id,
-  onResolveSuccess
+  onResolveSuccess,
 }: AdminModalProps) => {
   const [state, setState] = useState("Pending..."); // state
   const [value, setValue] = useState(""); // message
@@ -47,7 +48,17 @@ const AdminModal = ({
       onResolveSuccess();
       onClose();
     } catch (err) {
-      console.log(err);
+      toast.error("Error in resolving the ticket due to: " + err, {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: false,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+        transition: Bounce,
+      });
     } finally {
       setIsSubmitting(false);
     }
