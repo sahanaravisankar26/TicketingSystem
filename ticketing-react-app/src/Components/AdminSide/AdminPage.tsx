@@ -120,7 +120,7 @@ const AdminPage = () => {
                       className="bg-white p-5 rounded-xl shadow-sm border-4 border-red-600 hover:cursor-pointer hover:bg-red-100"
                     >
                       <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-bold text-lg text-gray-800">
+                        <h3 className="font-bold text-lg text-gray-800 underline">
                           {ticket.issue}
                         </h3>
                         <span className="text-xs text-gray-400">
