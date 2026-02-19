@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import AdminModal from "../UserSide/Modals/AdminModal";
-import { FaSearch } from "react-icons/fa";
+import { IoSearchSharp } from "react-icons/io5";
 
 interface Ticket {
   id: string;
@@ -141,8 +141,8 @@ const AdminPage = () => {
                         <p className="text-xs text-gray-400 mt-1 italic">
                           Ref: {ticket.id}
                         </p>
-                        <FaSearch
-                          className="hover:cursor-pointer text-xl rounded-2xl"
+                        <IoSearchSharp
+                          className="hover:cursor-pointer text-2xl rounded-2xl"
                           onClick={() => {
                             setModalOpen(true);
                             setTicketSelected(ticket.id);
