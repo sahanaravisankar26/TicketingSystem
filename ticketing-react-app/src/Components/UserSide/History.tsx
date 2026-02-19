@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { CiEdit } from "react-icons/ci";
 import EditModal from "./Modals/EditModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { CiTimer } from "react-icons/ci";
 import { MdDone } from "react-icons/md";
-import { FaTrash, FaSearch } from "react-icons/fa";
+import { FaTrash, FaPen } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
 import { toast, Bounce } from "react-toastify";
+import { IoSearchSharp } from "react-icons/io5";
 
 interface Ticket {
   id: string;
@@ -126,7 +126,7 @@ const History = ({ email }: { email: string }) => {
                   className="bg-white p-5 rounded-xl shadow-sm border-4 border-red-600"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-gray-800">
+                    <h3 className="font-bold text-lg text-gray-800 underline">
                       {ticket.issue}
                     </h3>
                     <span className="text-xs text-gray-400">
@@ -140,19 +140,19 @@ const History = ({ email }: { email: string }) => {
                         : ticket.description.slice(0, 27) + "..."}
                     </p>
                     <div className="flex flex-row mr-2">
-                      <CiEdit
+                      <FaPen
                         onClick={() => {
                           setIsModalOpen(true);
                           setSelectedTicketId(ticket.id);
                         }}
-                        className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm mr-2 hover:text-red-600"
+                        className="cursor-pointer text-gray-800 text-xl rounded-sm mr-2 hover:text-red-600"
                       />
                       <FaTrash
                         onClick={() => {
                           setDeleteModalOpen(true);
                           setSelectedTicketId(ticket.id);
                         }}
-                        className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm hover:text-red-600"
+                        className="cursor-pointer text-gray-800 text-xl rounded-sm hover:text-red-600"
                       />
                     </div>
                   </div>
@@ -172,7 +172,7 @@ const History = ({ email }: { email: string }) => {
                   className="bg-white p-5 rounded-xl shadow-sm border-4 border-green-600"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="font-bold text-lg text-gray-800">
+                    <h3 className="font-bold text-lg text-gray-800 underline">
                       {ticket.issue}
                     </h3>
                     <span className="text-xs text-gray-400">
@@ -181,14 +181,16 @@ const History = ({ email }: { email: string }) => {
                   </div>
                   <div className="flex justify-between items-start mb-2">
                     <p>
-                      Resolved by Admin. Message:{" "}
+                      <span className="font-bold">
+                        Resolved by Admin. Message:{" "}
+                      </span>
                       {ticket.message.length < 100
                         ? ticket.message
                         : ticket.message.slice(0, 97) + "..."}
                     </p>
-                    <div className="flex justify-between">
-                      <FaSearch
-                        className="hover:cursor-pointer text-xl rounded-2xl mr-2"
+                    <div className="flex items-center justify-between">
+                      <IoSearchSharp
+                        className="hover:cursor-pointer text-2xl rounded-2xl mr-2"
                         onClick={() => {
                           setViewModal(true);
                           setSelectedTicketId(ticket.id);
@@ -199,7 +201,7 @@ const History = ({ email }: { email: string }) => {
                           setDeleteModalOpen(true);
                           setSelectedTicketId(ticket.id);
                         }}
-                        className="cursor-pointer text-gray-800 text-xl border-2 rounded-sm hover:text-red-600"
+                        className="cursor-pointer text-gray-800 text-xl rounded-sm hover:text-red-600 h-[19.5px]"
                       />
                     </div>
                   </div>
