@@ -69,7 +69,7 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 				return
 			}
-			ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: "CREATE", Ticket: t}) // sending existing data as create
+			ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t}) // sending existing data as create
 			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
 			flusher.Flush()
 		}

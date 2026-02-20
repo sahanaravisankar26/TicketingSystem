@@ -27,10 +27,10 @@ func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
-		authHeader := r.Header.Get("Authorization")
+		authHeader := r.Header.Get(constants.Authorization)
 		if authHeader == "" {
 			response.RespondWithError(w, constants.ErrMissingToken, constants.StatusUnauthorized)
 			return

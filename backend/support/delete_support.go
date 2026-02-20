@@ -35,6 +35,6 @@ func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc
 			return
 		}
 
-		broker.Broadcast("DELETE", constants.Issue{Id: id.DocId})
+		broker.Broadcast(constants.DELETE, constants.Issue{Id: id.DocId})
 	}
 }

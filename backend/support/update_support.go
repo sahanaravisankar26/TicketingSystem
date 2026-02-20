@@ -49,6 +49,6 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 			return
 		}
 
-		broker.Broadcast("UPDATE", ticket)
+		broker.Broadcast(constants.UPDATE, ticket)
 	}
 }

@@ -37,8 +37,8 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *
 		var tickets constants.Issue
 		if err == nil && res.Next() {
 			res.Row(&tickets)
-			broker.Broadcast("UPDATE", tickets)
-			broker.NotifyUser(tickets.Email, "UPDATE", tickets)
+			broker.Broadcast(constants.UPDATE, tickets)
+			broker.NotifyUser(tickets.Email, constants.UPDATE, tickets)
 		}
 
 		if err != nil {
