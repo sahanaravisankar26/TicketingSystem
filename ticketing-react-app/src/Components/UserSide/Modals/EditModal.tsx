@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
+import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 
 interface EditModalProps {
   isOpen: boolean;
@@ -28,7 +29,7 @@ const EditModal = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           id,
@@ -37,22 +38,13 @@ const EditModal = ({
       });
 
       if (!res.ok) {
-        throw new Error("Failed to update the ticket");
+        toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
+        return;
       }
       onUpdateSuccess(value);
       onClose();
     } catch (err) {
-      toast.error("Error on updating due to: " + err, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Error on updating due to: " + err, DEFAULT_TOAST_OPTIONS);
     } finally {
       setIsUpdating(false);
     }

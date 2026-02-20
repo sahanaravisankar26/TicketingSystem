@@ -1,5 +1,6 @@
 import React, { useState } from "react";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
+import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 
 interface AdminModalProps {
   isOpen: boolean;
@@ -48,17 +49,10 @@ const AdminModal = ({
       onResolveSuccess();
       onClose();
     } catch (err) {
-      toast.error("Error in resolving the ticket due to: " + err, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error(
+        "Error in resolving the ticket due to: " + err,
+        DEFAULT_TOAST_OPTIONS,
+      );
     } finally {
       setIsSubmitting(false);
     }

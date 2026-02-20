@@ -52,7 +52,6 @@ func LoginHandler(collection *gocb.Collection) http.HandlerFunc {
 		}
 
 		response := map[string]interface{}{
-			"message": "Login successful",
 			"user": map[string]string{
 				"email": storedUser.Email,
 			},

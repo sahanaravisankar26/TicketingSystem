@@ -5,9 +5,10 @@ import { CiTimer } from "react-icons/ci";
 import { MdDone } from "react-icons/md";
 import { FaTrash, FaPen } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
 import { IoSearchSharp } from "react-icons/io5";
 import { EventSourcePolyfill } from "event-source-polyfill";
+import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 
 interface Ticket {
   id: string;
@@ -35,7 +36,6 @@ const History = ({ email }: { email: string }) => {
     });
 
     eventSource.onmessage = (event) => {
-      console.log(typeof event)
       try {
         const data = JSON.parse(event.data);
         const { action, ticket } = data;
@@ -51,17 +51,7 @@ const History = ({ email }: { email: string }) => {
           return prev;
         });
       } catch (err) {
-        toast.error("Parse error:" + err, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.error("Parse error:" + err, DEFAULT_TOAST_OPTIONS);
       }
     };
 
