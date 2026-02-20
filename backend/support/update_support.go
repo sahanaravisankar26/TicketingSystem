@@ -1,9 +1,10 @@
 package support
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/couchbase/gocb/v2"
@@ -17,19 +18,19 @@ type Update struct {
 func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodPost {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
 
 		var update Update
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
-			http.Error(w, "Invalid request", http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
 		}
 		_, err = collection.MutateIn(update.Id, []gocb.MutateInSpec{
@@ -37,16 +38,20 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 		}, &gocb.MutateInOptions{})
 
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Update failed: %v", err), http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrFailedToUpdate, constants.StatusInternalServerError)
 			return
 		}
 
 		var ticket Issue
 		getRes, err := collection.Get(update.Id, nil)
 		if err != nil {
+			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusNotFound)
+			return
 		}
 
 		if err := getRes.Content(&ticket); err != nil {
+			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+			return
 		}
 
 		broker.Broadcast("UPDATE", ticket)

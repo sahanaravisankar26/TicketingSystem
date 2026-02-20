@@ -1,7 +1,9 @@
 package support
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -14,12 +16,12 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		cors.EnableCORS(&w)
 		cors.SetSSEHeader(&w)
 
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodGet {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodGet {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
 
@@ -27,20 +29,20 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		//     Email string `json:"email"`
 		// }
 		// if err := json.NewDecoder(r.Body).Decode(&requestBody); err != nil {
-		//     http.Error(w, "Invalid request", http.StatusBadRequest)
+		//     http.Error(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 		//     return
 		// }
 
 		// SSE started
 		email := r.URL.Query().Get("email")
 		if email == "" {
-			http.Error(w, "Email is needed", http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrMailNeeded, constants.StatusBadRequest)
 			return
 		}
 
 		// flusher, ok := w.(http.Flusher)
 		// if !ok {
-		// 	http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+		// 	http.Error(w, "Streaming unsupported", constants.StatusInternalServerError)
 		// 	return
 		// }
 
@@ -51,57 +53,63 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		})
 
 		if err != nil {
-			http.Error(w, "Query failed: "+err.Error(), http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 			return
 		}
 
-		if err == nil { // remove this - already made a check above
-            for res.Next() {
-                var t Issue
-                if err := res.Row(&t); err == nil {
-                    ticketMarshal, _ := json.Marshal(TicketEvent{Action: "CREATE", Ticket: t}) // sending existing data as create
-                    fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
-                }
-            }
-            w.(http.Flusher).Flush()
-        }
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			response.RespondWithError(w, constants.ErrStreamUnsupported, constants.StatusInternalServerError)
+			return
+		}
+
+		for res.Next() {
+			var t Issue
+			if err := res.Row(&t); err != nil {
+				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+				return
+			}
+			ticketMarshal, _ := json.Marshal(TicketEvent{Action: "CREATE", Ticket: t}) // sending existing data as create
+			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
+			flusher.Flush()
+		}
 
 		clientChannel := make(chan TicketEvent)
 		broker.mu.Lock()
 		if broker.Users[email] == nil { // fail safe (most probably won't need it)
-            broker.Users[email] = make(map[chan TicketEvent]bool) // don't overwrite other open tabs for this user
-        }
+			broker.Users[email] = make(map[chan TicketEvent]bool) // don't overwrite other open tabs for this user
+		}
 		broker.Users[email][clientChannel] = true
 		broker.mu.Unlock()
 
 		defer func() {
-            broker.mu.Lock()
-            delete(broker.Users[email], clientChannel)
-            broker.mu.Unlock()
-        }()
+			broker.mu.Lock()
+			delete(broker.Users[email], clientChannel)
+			broker.mu.Unlock()
+		}()
 
 		for {
-            select {
-            case event := <-clientChannel:
-                msg, _ := json.Marshal(event)
-                fmt.Fprintf(w, "data: %s\n\n", msg)
-                w.(http.Flusher).Flush()
-            case <-r.Context().Done():
-                return
-            }
-        }
+			select {
+			case event := <-clientChannel:
+				msg, _ := json.Marshal(event)
+				fmt.Fprintf(w, "data: %s\n\n", msg)
+				flusher.Flush()
+			case <-r.Context().Done():
+				return
+			}
+		}
 
 		// var tickets []Issue
 		// for res.Next() {
 		// 	var ticket Issue
 		// 	if err := res.Row(&ticket); err != nil {
-		// 		http.Error(w, "Row mapping failed", http.StatusInternalServerError)
+		// 		http.Error(w, "Row mapping failed", constants.StatusInternalServerError)
 		// 		return
 		// 	}
 		// 	ticketMarshal, _ := json.Marshal(ticket) // make it to json because my eventsource needs in such format
 		// 	fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
 		// 	flusher.Flush() // Flush after each ticket
-			// tickets = append(tickets, ticket)
+		// tickets = append(tickets, ticket)
 		// }
 
 		// w.Header().Set("Content-Type", "application/json")

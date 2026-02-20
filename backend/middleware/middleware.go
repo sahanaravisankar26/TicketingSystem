@@ -1,7 +1,9 @@
 package middleware
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -30,7 +32,7 @@ func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		}
 		authHeader := r.Header.Get("Authorization")
 		if authHeader == "" {
-			http.Error(w, "Missing token", http.StatusUnauthorized)
+			response.RespondWithError(w, constants.ErrMissingToken, constants.StatusUnauthorized)
 			return
 		}
 
@@ -41,7 +43,7 @@ func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 		})
 
 		if err != nil || !token.Valid {
-			http.Error(w, "Invalid token", http.StatusUnauthorized)
+			response.RespondWithError(w, constants.ErrInvalidToken, constants.StatusUnauthorized)
 			return
 		}
 

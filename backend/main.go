@@ -30,8 +30,6 @@ func main() {
 		log.Fatal("Missing required environment variables. Check CONNECTION_STRING, CB_BUCKETNAME, and CB_BUCKETPASSWORD")
 	}
 
-	// fmt.Printf("Connecting to: %s with username: %s\n", connectionString, username)
-
 	cluster, err := gocb.Connect(connectionString, gocb.ClusterOptions{
 		Authenticator: gocb.PasswordAuthenticator{
 			Username: username,
