@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
+import { Routes } from "../../Contants/routes";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -15,7 +16,7 @@ const AdminLogin = () => {
       password === import.meta.env.VITE_PASSWORD
     ) {
       // Redirect to Admin Dashboard
-      navigate("/admin-dashboard");
+      navigate(Routes.AdminDashboard);
     } else {
       toast.error("Invalid Admin Credentials", DEFAULT_TOAST_OPTIONS);
     }

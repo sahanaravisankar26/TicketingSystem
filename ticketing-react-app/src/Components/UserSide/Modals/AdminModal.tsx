@@ -43,7 +43,8 @@ const AdminModal = ({
 
       if (!res.ok) {
         setState("Pending...");
-        throw new Error("Failed to update the ticket");
+        toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
+        return;
       }
 
       onResolveSuccess();

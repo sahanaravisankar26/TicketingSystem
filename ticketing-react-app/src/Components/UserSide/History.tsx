@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 import { IoSearchSharp } from "react-icons/io5";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
+import { CRUD } from "../../Contants/constants";
 
 interface Ticket {
   id: string;
@@ -41,11 +42,11 @@ const History = ({ email }: { email: string }) => {
         const { action, ticket } = data;
         setTickets((prev) => {
           if (!ticket.id) return prev;
-          if (action === "CREATE") {
+          if (action === CRUD.Create) {
             const duplicate = prev.find((t) => t.id === ticket.id);
             if (duplicate) return prev;
             return [ticket, ...prev];
-          } else if (action === "UPDATE") {
+          } else if (action === CRUD.Update) {
             return prev.map((t) => (t.id === ticket.id ? ticket : t));
           }
           return prev;

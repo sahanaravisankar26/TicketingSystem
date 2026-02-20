@@ -1,11 +1,12 @@
 import React from "react";
 import logo from "../../assets/logo.png";
 import { useNavigate } from "react-router-dom";
+import { Routes } from "../../Contants/routes";
 
 const AdminNavbar = () => {
   const navigate = useNavigate();
   const handleLogout = () => {
-    navigate("/sign-in");
+    navigate(Routes.SignIn);
   };
 
   return (
