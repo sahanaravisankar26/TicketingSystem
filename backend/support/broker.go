@@ -3,6 +3,7 @@ package support
 import (
 	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -40,18 +41,31 @@ func (b *Broker) ServeAdminSSE(cluster *gocb.Cluster) http.HandlerFunc {
 		// Fetch existing tickets
 		query := "SELECT id, email, issue, description, message, state FROM `tickets`._default._default ORDER BY id DESC;"
 		res, err := cluster.Query(query, nil)
-		if err == nil {
-			for res.Next() {
-				var t constants.Issue
-				if err := res.Row(&t); err == nil {
-					ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t})
-					fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
-				}
-			}
-			w.(http.Flusher).Flush()
+		if err != nil {
+			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+			return
 		}
 
-		// Enter the Live constants.Broker Loop
+		flusher, ok := w.(http.Flusher)
+		if !ok {
+			response.RespondWithError(w, constants.ErrStreamUnsupported, constants.StatusInternalServerError)
+			return
+		}
+
+		for res.Next() {
+			var t constants.Issue
+
+			if err := res.Row(&t); err != nil {
+				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+				return
+			}
+
+			ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t})
+			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
+		}
+		flusher.Flush()
+
+		// Enter the Live Broker Loop
 		clientChan := make(chan constants.TicketEvent)
 		b.Mu.Lock()
 		b.Admins[clientChan] = true
@@ -68,7 +82,7 @@ func (b *Broker) ServeAdminSSE(cluster *gocb.Cluster) http.HandlerFunc {
 			case event := <-clientChan:
 				msg, _ := json.Marshal(event)
 				fmt.Fprintf(w, "data: %s\n\n", msg)
-				w.(http.Flusher).Flush()
+				flusher.Flush()
 			case <-r.Context().Done():
 				return
 			}
