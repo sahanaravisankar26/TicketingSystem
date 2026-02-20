@@ -10,12 +10,13 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { useLocation } from "react-router-dom";
-import logo from "../../assets/logo.png"
+import logo from "../../assets/logo.png";
+import { Routes } from "../../Contants/routes";
 
 const navigation = [
-  { name: "Dashboard", href: "dashboard" },
-  { name: "Submit Issue", href: "issue" },
-  { name: "History", href: "history" },
+  { name: "Dashboard", href: Routes.Dashboard },
+  { name: "Submit Issue", href: Routes.Issue },
+  { name: "History", href: Routes.History },
 ];
 
 function classNames(...classes) {
@@ -50,11 +51,7 @@ export default function Navbar({ onLogout }) {
           </div>
           <div className="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
             <div className="flex shrink-0 items-center">
-              <img
-                alt="Couchbase"
-                src={logo}
-                className="h-8 w-auto"
-              />
+              <img alt="Couchbase" src={logo} className="h-8 w-auto" />
             </div>
             <div className="hidden sm:ml-6 sm:block">
               <div className="flex space-x-4">

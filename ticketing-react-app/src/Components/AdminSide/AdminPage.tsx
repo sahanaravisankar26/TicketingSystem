@@ -1,15 +1,8 @@
 import React, { useState, useEffect } from "react";
 import AdminModal from "../UserSide/Modals/AdminModal";
 import { IoSearchSharp } from "react-icons/io5";
-
-interface Ticket {
-  id: string;
-  email: string;
-  issue: string;
-  description: string;
-  message: string;
-  state: string;
-}
+import type { Ticket } from "../../Contants/interfaceConstants";
+import { CRUD } from "../../Contants/constants";
 
 const AdminPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -78,13 +71,13 @@ const AdminPage = () => {
     eventSource.onmessage = (event) => {
       const { action, ticket } = JSON.parse(event.data);
       setTickets((prev) => {
-        if (action === "CREATE") {
+        if (action === CRUD.Create) {
           const duplicate = prev.find((t) => t.id === ticket.id);
           if (duplicate) return prev;
           return [ticket, ...prev];
-        } else if (action === "DELETE") {
+        } else if (action === CRUD.Delete) {
           return prev.filter((t) => t.id !== ticket.id);
-        } else if (action === "UPDATE") {
+        } else if (action === CRUD.Update) {
           return prev.map((t) =>
             t.id === ticket.id ? { ...t, ...ticket } : t,
           );

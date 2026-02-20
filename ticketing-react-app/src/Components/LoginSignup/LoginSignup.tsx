@@ -3,6 +3,7 @@ import UserPage from "../UserSide/UserPage";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
+import { Routes } from "../../Contants/routes";
 
 const LoginSignup = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -11,12 +12,12 @@ const LoginSignup = () => {
   const navigate = useNavigate();
 
   const gotoAdmin = () => {
-    navigate("/admin-login");
+    navigate(Routes.AdminLogin);
   };
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedInUser");
-    if (savedUser && savedUser !== "undefined") {
+    if (savedUser && savedUser != undefined) {
       try {
         return JSON.parse(savedUser);
       } catch (e) {
