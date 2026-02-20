@@ -64,28 +64,28 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		}
 
 		for res.Next() {
-			var t Issue
+			var t constants.Issue
 			if err := res.Row(&t); err != nil {
 				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 				return
 			}
-			ticketMarshal, _ := json.Marshal(TicketEvent{Action: "CREATE", Ticket: t}) // sending existing data as create
+			ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: "CREATE", Ticket: t}) // sending existing data as create
 			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
 			flusher.Flush()
 		}
 
-		clientChannel := make(chan TicketEvent)
-		broker.mu.Lock()
+		clientChannel := make(chan constants.TicketEvent)
+		broker.Mu.Lock()
 		if broker.Users[email] == nil { // fail safe (most probably won't need it)
-			broker.Users[email] = make(map[chan TicketEvent]bool) // don't overwrite other open tabs for this user
+			broker.Users[email] = make(map[chan constants.TicketEvent]bool) // don't overwrite other open tabs for this user
 		}
 		broker.Users[email][clientChannel] = true
-		broker.mu.Unlock()
+		broker.Mu.Unlock()
 
 		defer func() {
-			broker.mu.Lock()
+			broker.Mu.Lock()
 			delete(broker.Users[email], clientChannel)
-			broker.mu.Unlock()
+			broker.Mu.Unlock()
 		}()
 
 		for {

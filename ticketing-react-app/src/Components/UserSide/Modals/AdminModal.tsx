@@ -126,7 +126,7 @@ const AdminModal = ({
               <textarea
                 id="message"
                 className="bg-neutral-secondary-medium border border-default-medium focus:border-2 text-heading focus:border-red-500 outline-none text-sm rounded-base focus:ring-brand focus:border-brand block w-full p-3.5 shadow-xs placeholder:text-body"
-                placeholder="Write your issues here..."
+                placeholder="Write your solution here..."
                 required
                 value={value}
                 onChange={(e) => setValue(e.target.value)}

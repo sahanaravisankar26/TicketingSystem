@@ -1,38 +1,29 @@
 package support
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"sync"
 
 	"github.com/couchbase/gocb/v2"
 )
 
-type TicketEvent struct {
-	Action string `json:"action"` // "CREATE", "UPDATE", "DELETE"
-	Ticket Issue  `json:"ticket"`
-}
-
-type Broker struct {
-	Admins map[chan TicketEvent]bool
-	Users  map[string]map[chan TicketEvent]bool
-	mu     sync.Mutex
-}
+type Broker constants.Broker
 
 func NewBroker() *Broker {
-	return &Broker{
-		Admins: make(map[chan TicketEvent]bool),
-		Users:  make(map[string]map[chan TicketEvent]bool),
-	}
+	return (*Broker)(&constants.Broker{
+		Admins: make(map[chan constants.TicketEvent]bool),
+		Users:  make(map[string]map[chan constants.TicketEvent]bool),
+	})
 }
 
 // Broadcast sends the update to all connected admins
-func (b *Broker) Broadcast(action string, ticket Issue) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	event := TicketEvent{Action: action, Ticket: ticket}
+func (b *Broker) Broadcast(action string, ticket constants.Issue) {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
+	event := constants.TicketEvent{Action: action, Ticket: ticket}
 	for ch := range b.Admins {
 		select {
 		case ch <- event:
@@ -51,25 +42,25 @@ func (b *Broker) ServeAdminSSE(cluster *gocb.Cluster) http.HandlerFunc {
 		res, err := cluster.Query(query, nil)
 		if err == nil {
 			for res.Next() {
-				var t Issue
+				var t constants.Issue
 				if err := res.Row(&t); err == nil {
-					ticketMarshal, _ := json.Marshal(TicketEvent{Action: "CREATE", Ticket: t})
+					ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: "CREATE", Ticket: t})
 					fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
 				}
 			}
 			w.(http.Flusher).Flush()
 		}
 
-		// Enter the Live Broker Loop
-		clientChan := make(chan TicketEvent)
-		b.mu.Lock()
+		// Enter the Live constants.Broker Loop
+		clientChan := make(chan constants.TicketEvent)
+		b.Mu.Lock()
 		b.Admins[clientChan] = true
-		b.mu.Unlock()
+		b.Mu.Unlock()
 
 		defer func() {
-			b.mu.Lock()
+			b.Mu.Lock()
 			delete(b.Admins, clientChan)
-			b.mu.Unlock()
+			b.Mu.Unlock()
 		}()
 
 		for {
@@ -85,10 +76,10 @@ func (b *Broker) ServeAdminSSE(cluster *gocb.Cluster) http.HandlerFunc {
 	}
 }
 
-func (b *Broker) NotifyUser(email string, action string, ticket Issue) {
-	b.mu.Lock()
-	defer b.mu.Unlock()
-	event := TicketEvent{Action: action, Ticket: ticket}
+func (b *Broker) NotifyUser(email string, action string, ticket constants.Issue) {
+	b.Mu.Lock()
+	defer b.Mu.Unlock()
+	event := constants.TicketEvent{Action: action, Ticket: ticket}
 	if chans, ok := b.Users[email]; ok {
 		for ch := range chans {
 			select {

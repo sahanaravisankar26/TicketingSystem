@@ -10,10 +10,6 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-type DocId struct {
-	DocId string `json:"id"`
-}
-
 func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
@@ -26,7 +22,7 @@ func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc
 			return
 		}
 
-		var id DocId
+		var id constants.DocId
 		err := json.NewDecoder(r.Body).Decode(&id)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
@@ -39,6 +35,6 @@ func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc
 			return
 		}
 
-		broker.Broadcast("DELETE", Issue{Id: id.DocId})
+		broker.Broadcast("DELETE", constants.Issue{Id: id.DocId})
 	}
 }

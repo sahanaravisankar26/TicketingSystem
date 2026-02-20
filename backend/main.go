@@ -58,7 +58,7 @@ func main() {
 	fmt.Println("Collections made")
 
 	r := mux.NewRouter()
-	ticketBroker := support.NewBroker()
+	var ticketBroker *support.Broker = support.NewBroker()
 
 	// SIGNUP
 	r.HandleFunc("/signup", signin.SignupHandler(user_collection))

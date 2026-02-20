@@ -42,7 +42,7 @@ func FetchAllSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster) 
 
 		// var tickets []Issue
 		for res.Next() {
-			var ticket Issue
+			var ticket constants.Issue
 			if err := res.Row(&ticket); err != nil {
 				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 				return
