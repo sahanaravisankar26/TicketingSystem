@@ -10,15 +10,6 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-type Issue struct {
-	Id          string `json:"id"`
-	Email       string `json:"email"`
-	Issue       string `json:"issue"`
-	Description string `json:"description"`
-	Message     string `json:"message"`
-	State       string `json:"state"`
-}
-
 func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
@@ -33,7 +24,7 @@ func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 			return
 		}
 
-		var issue Issue
+		var issue constants.Issue
 		err := json.NewDecoder(r.Body).Decode(&issue)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)

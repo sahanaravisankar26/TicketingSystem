@@ -10,14 +10,6 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-// try to do through query now
-
-type UpdateAdmin struct {
-	Id      string `json:"id"`
-	Message string `json:"message"`
-	State   string `json:"state"`
-}
-
 func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
@@ -29,7 +21,7 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *
 			return
 		}
 
-		var update UpdateAdmin
+		var update constants.UpdateAdmin
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
@@ -42,7 +34,7 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *
 			Adhoc:                true,
 		})
 
-		var tickets Issue
+		var tickets constants.Issue
 		if err == nil && res.Next() {
 			res.Row(&tickets)
 			broker.Broadcast("UPDATE", tickets)

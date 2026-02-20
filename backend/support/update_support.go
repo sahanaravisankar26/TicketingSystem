@@ -10,11 +10,6 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-type Update struct {
-	Id          string `json:"id"`
-	Description string `json:"description"`
-}
-
 func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
@@ -27,7 +22,7 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 			return
 		}
 
-		var update Update
+		var update constants.Update
 		err := json.NewDecoder(r.Body).Decode(&update)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
@@ -42,7 +37,7 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 			return
 		}
 
-		var ticket Issue
+		var ticket constants.Issue
 		getRes, err := collection.Get(update.Id, nil)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusNotFound)

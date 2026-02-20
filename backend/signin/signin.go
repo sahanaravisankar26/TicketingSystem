@@ -11,11 +11,6 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-type User struct {
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
-
 func SignupHandler(collection *gocb.Collection) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
@@ -29,7 +24,7 @@ func SignupHandler(collection *gocb.Collection) http.HandlerFunc {
 			return
 		}
 
-		var user User
+		var user constants.User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
@@ -68,7 +63,7 @@ func LoginHandler(collection *gocb.Collection) http.HandlerFunc {
 			return
 		}
 
-		var credentials User
+		var credentials constants.User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
@@ -80,7 +75,7 @@ func LoginHandler(collection *gocb.Collection) http.HandlerFunc {
 			return
 		}
 
-		var storedUser User
+		var storedUser constants.User
 		result.Content(&storedUser)
 
 		if storedUser.Password != credentials.Password {
