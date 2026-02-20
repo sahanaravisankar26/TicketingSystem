@@ -1,8 +1,10 @@
 package signin
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
 	"capella-auth/middleware"
+	"capella-auth/response"
 	"encoding/json"
 	"net/http"
 
@@ -18,32 +20,32 @@ func SignupHandler(collection *gocb.Collection) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodPost {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
 
 		var user User
 		if err := json.NewDecoder(r.Body).Decode(&user); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
 		}
 
 		// Check if user already exists
 		_, err := collection.Get(user.Email, nil)
 		if err == nil {
-			http.Error(w, "User already exists", http.StatusConflict)
+			response.RespondWithError(w, constants.ErrUserExists, constants.StatusConflict)
 			return
 		}
 
 		// Save user
 		_, err = collection.Insert(user.Email, user, nil)
 		if err != nil {
-			http.Error(w, "Failed to create user", http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrFailedToCreateUser, constants.StatusInternalServerError)
 			return
 		}
 
@@ -57,24 +59,24 @@ func LoginHandler(collection *gocb.Collection) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodPost {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
 
 		var credentials User
 		if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
 		}
 
 		result, err := collection.Get(credentials.Email, nil)
 		if err != nil {
-			http.Error(w, "User not found", http.StatusUnauthorized)
+			response.RespondWithError(w, constants.ErrUserNotFound, constants.StatusNotFound)
 			return
 		}
 
@@ -82,13 +84,13 @@ func LoginHandler(collection *gocb.Collection) http.HandlerFunc {
 		result.Content(&storedUser)
 
 		if storedUser.Password != credentials.Password {
-			http.Error(w, "Invalid password", http.StatusUnauthorized)
+			response.RespondWithError(w, constants.ErrInvalidPassword, constants.StatusUnauthorized)
 			return
 		}
 
 		token, err := middleware.GenerateJWT(storedUser.Email)
 		if err != nil {
-			http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrFailedTokenGeneration, constants.StatusInternalServerError)
 			return
 		}
 

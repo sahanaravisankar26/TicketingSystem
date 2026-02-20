@@ -15,10 +15,15 @@ const LoginSignup = () => {
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedInUser");
-    return savedUser !== undefined && savedUser !== null
-      ? JSON.parse(savedUser)
-      : null;
-    // return null; // To debug
+    if (savedUser && savedUser !== "undefined") {
+      try {
+        return JSON.parse(savedUser);
+      } catch (e) {
+        console.error("Failed to parse user", e);
+        return null;
+      }
+    }
+    return null;
   });
 
   const handleLogout = () => {

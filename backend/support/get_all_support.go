@@ -1,7 +1,9 @@
 package support
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,28 +15,28 @@ func FetchAllSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster) 
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		cors.SetSSEHeader(&w)
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodGet {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodGet {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
 
 		flusher, ok := w.(http.Flusher)
 		if !ok {
-			http.Error(w, "Streaming unsupported", http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrStreamUnsupported, constants.StatusInternalServerError)
 			return
 		}
 
 		query := "SELECT id, email, issue, description, message, state FROM `tickets`._default._default ORDER BY id DESC;"
-        res, err := cluster.Query(query, &gocb.QueryOptions{
-            Adhoc: true,
-        })
+		res, err := cluster.Query(query, &gocb.QueryOptions{
+			Adhoc: true,
+		})
 
 		if err != nil {
-			http.Error(w, "Query failed: "+err.Error(), http.StatusInternalServerError)
+			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 			return
 		}
 
@@ -42,12 +44,12 @@ func FetchAllSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster) 
 		for res.Next() {
 			var ticket Issue
 			if err := res.Row(&ticket); err != nil {
-				http.Error(w, "Row mapping failed", http.StatusInternalServerError)
+				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
 				return
 			}
 			ticketMarshal, _ := json.Marshal(ticket)
 			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
-			flusher.Flush();
+			flusher.Flush()
 			// tickets = append(tickets, ticket)
 		}
 

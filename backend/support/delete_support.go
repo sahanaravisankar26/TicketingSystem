@@ -1,9 +1,10 @@
 package support
 
 import (
+	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/response"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/couchbase/gocb/v2"
@@ -16,28 +17,28 @@ type DocId struct {
 func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
-		if r.Method == http.MethodOptions {
+		if r.Method == constants.MethodOptions {
 			return
 		}
 
-		if r.Method != http.MethodPost {
-			http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
+		if r.Method != constants.MethodPost {
+			response.RespondWithError(w, constants.ErrMethodNotAllowed, constants.StatusMethodNotAllowed)
 			return
 		}
-		
+
 		var id DocId
 		err := json.NewDecoder(r.Body).Decode(&id)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to fetch due to %v", err), http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
 			return
 		}
 
 		_, err = collection.Remove(id.DocId, nil)
 		if err != nil {
-			http.Error(w, fmt.Sprintf("Failed to delete due to %v", err), http.StatusBadRequest)
+			response.RespondWithError(w, constants.ErrFailedToDelete, constants.StatusBadRequest)
 			return
 		}
 
-		broker.Broadcast("DELETE", Issue{Id: id.DocId}) 
+		broker.Broadcast("DELETE", Issue{Id: id.DocId})
 	}
 }
