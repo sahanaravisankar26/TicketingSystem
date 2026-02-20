@@ -44,7 +44,7 @@ func (b *Broker) ServeAdminSSE(cluster *gocb.Cluster) http.HandlerFunc {
 			for res.Next() {
 				var t constants.Issue
 				if err := res.Row(&t); err == nil {
-					ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: "CREATE", Ticket: t})
+					ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t})
 					fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
 				}
 			}

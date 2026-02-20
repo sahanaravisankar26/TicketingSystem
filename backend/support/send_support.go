@@ -13,7 +13,7 @@ import (
 func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
-		w.Header().Set("Content-Type", "application/json")
+		w.Header().Set(constants.ContentType, constants.ApplicationJSON)
 
 		if r.Method == constants.MethodOptions {
 			return
@@ -47,6 +47,6 @@ func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "Your issue has been successfully submitted. Stay tuned for updates!",
 		})
-		broker.Broadcast("CREATE", issue)
+		broker.Broadcast(constants.CREATE, issue)
 	}
 }

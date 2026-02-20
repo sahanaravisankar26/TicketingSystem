@@ -1,11 +1,12 @@
 package cors
 
 import (
+	"capella-auth/constants"
 	"net/http"
 )
 
 func EnableCORS(w *http.ResponseWriter) {
-	(*w).Header().Set("Access-Control-Allow-Origin", "*")
-	(*w).Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
-	(*w).Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+	(*w).Header().Set(constants.AccessControlAllowOrigin, constants.All)
+	(*w).Header().Set(constants.AccessControlAllowHeaders, constants.ContentType + constants.AND + constants.Authorization)
+	(*w).Header().Set(constants.AccessControlAllowMethods, constants.GetPostOption)
 }
