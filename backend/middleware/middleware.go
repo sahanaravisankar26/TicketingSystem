@@ -53,6 +53,6 @@ func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{
-		"message": "You accessed a protected route",
+		"message": "You are a verified user.",
 	})
 }

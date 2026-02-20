@@ -7,6 +7,7 @@ import { FaTrash, FaPen } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
 import { toast, Bounce } from "react-toastify";
 import { IoSearchSharp } from "react-icons/io5";
+import { EventSourcePolyfill } from "event-source-polyfill";
 
 interface Ticket {
   id: string;
@@ -27,9 +28,14 @@ const History = ({ email }: { email: string }) => {
 
   useEffect(() => {
     const endpoint = `http://localhost:8080/fetch-history?email=${encodeURIComponent(email)}`;
-    const eventSource = new EventSource(endpoint);
+    const eventSource = new EventSourcePolyfill(endpoint, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
 
     eventSource.onmessage = (event) => {
+      console.log(typeof event)
       try {
         const data = JSON.parse(event.data);
         const { action, ticket } = data;
@@ -37,7 +43,7 @@ const History = ({ email }: { email: string }) => {
           if (!ticket.id) return prev;
           if (action === "CREATE") {
             const duplicate = prev.find((t) => t.id === ticket.id);
-            if (duplicate) return ticket;
+            if (duplicate) return prev;
             return [ticket, ...prev];
           } else if (action === "UPDATE") {
             return prev.map((t) => (t.id === ticket.id ? ticket : t));
