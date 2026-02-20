@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { toast, Bounce } from "react-toastify";
+import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 
 const SupportIssue = ({ email }: { email: string }) => {
   const [issue, setIssue] = useState("");
@@ -19,7 +20,7 @@ const SupportIssue = ({ email }: { email: string }) => {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${localStorage.getItem("token")}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
         body: JSON.stringify({
           id: Date.now().toString(),
@@ -34,17 +35,10 @@ const SupportIssue = ({ email }: { email: string }) => {
       const data = await result.json();
 
       if (!result.ok) {
-        toast.error(data.error || "Something went wrong", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.error(
+          data.error || "Something went wrong",
+          DEFAULT_TOAST_OPTIONS,
+        );
         setIsSubmitting(false);
         return;
       }
@@ -61,17 +55,7 @@ const SupportIssue = ({ email }: { email: string }) => {
     } catch (err) {
       toast.error(
         "Failed to submit issue due to " + err + ". Please try again.",
-        {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        },
+        DEFAULT_TOAST_OPTIONS,
       );
     } finally {
       setIsSubmitting(false);

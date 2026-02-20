@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
+import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 
 const AdminLogin = () => {
   const [username, setUsername] = useState("");
@@ -16,17 +17,7 @@ const AdminLogin = () => {
       // Redirect to Admin Dashboard
       navigate("/admin-dashboard");
     } else {
-      toast.error("Invalid Admin Credentials", {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Invalid Admin Credentials", DEFAULT_TOAST_OPTIONS);
     }
   };
 

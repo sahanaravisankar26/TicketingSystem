@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import UserPage from "../UserSide/UserPage";
 import { useNavigate } from "react-router-dom";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
+import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 
 const LoginSignup = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -53,17 +54,10 @@ const LoginSignup = () => {
       const data = await result.json();
 
       if (!result.ok) {
-        toast.error(data.error || "Something went wrong", {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: false,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
-        });
+        toast.error(
+          data.error || "Something went wrong",
+          DEFAULT_TOAST_OPTIONS,
+        );
         return;
       }
 
@@ -71,21 +65,10 @@ const LoginSignup = () => {
       localStorage.setItem("token", data.token);
       setUser(data.user);
 
-      // alert(data.message);
       setEmail("");
       setPassword("");
     } catch (error) {
-      toast.error("Error is " + error, {
-        position: "top-right",
-        autoClose: 5000,
-        hideProgressBar: false,
-        closeOnClick: false,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-        theme: "light",
-        transition: Bounce,
-      });
+      toast.error("Error is " + error, DEFAULT_TOAST_OPTIONS);
     }
   };
 
