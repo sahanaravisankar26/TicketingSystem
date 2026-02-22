@@ -1,19 +1,15 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
-
-interface DeleteModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  id: string;
-  onDeleteSuccess: () => void;
-}
+import { APIEndpoints } from "../../../Contants/routes";
+import type { DeleteModalProps } from "../../../Contants/interfaceConstants";
+import { Methods } from "../../../Contants/constants";
 
 const DeleteModal = ({
   isOpen,
   onClose,
   id,
-  onDeleteSuccess,
+  onSuccess,
 }: DeleteModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -21,9 +17,9 @@ const DeleteModal = ({
     if (!id) return;
     setIsDeleting(true);
     try {
-      const endpoint = "http://localhost:8080/delete-support";
+      const endpoint = APIEndpoints.DeleteTicketEndpoint;
       const res = await fetch(endpoint, {
-        method: "POST",
+        method: Methods.POST,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -37,7 +33,7 @@ const DeleteModal = ({
         toast.error("Failed to delete the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }
-      onDeleteSuccess();
+      onSuccess();
       onClose();
     } catch (err) {
       toast.error("Error on delete due to: " + err, DEFAULT_TOAST_OPTIONS);

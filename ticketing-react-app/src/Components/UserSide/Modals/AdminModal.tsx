@@ -1,15 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
-
-interface AdminModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  description: string;
-  issue: string;
-  id: string | null;
-  onResolveSuccess: () => void;
-}
+import { APIEndpoints } from "../../../Contants/routes";
+import type { ModalProps } from "../../../Contants/interfaceConstants";
+import { Methods } from "../../../Contants/constants";
 
 const AdminModal = ({
   isOpen,
@@ -17,8 +11,8 @@ const AdminModal = ({
   description,
   issue,
   id,
-  onResolveSuccess,
-}: AdminModalProps) => {
+  onSuccess,
+}: ModalProps) => {
   const [state, setState] = useState("Pending..."); // state
   const [value, setValue] = useState(""); // message
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,9 +22,9 @@ const AdminModal = ({
     const resolved = "Resolved";
     setState(resolved);
     try {
-      const endpoint = "http://localhost:8080/admin-updates";
+      const endpoint = APIEndpoints.AdminUpdateTicketEndpoint;
       const res = await fetch(endpoint, {
-        method: "POST",
+        method: Methods.POST,
         headers: {
           "Content-Type": "application/json",
         },
@@ -47,11 +41,11 @@ const AdminModal = ({
         return;
       }
 
-      onResolveSuccess();
+      onSuccess?.();
       onClose();
-    } catch (err) {
+    } catch {
       toast.error(
-        "Error in resolving the ticket due to: " + err,
+        "Error in resolving the ticket",
         DEFAULT_TOAST_OPTIONS,
       );
     } finally {

@@ -20,7 +20,7 @@ func GenerateJWT(email string) (string, error) {
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims) // unsealed part, signed with hs 256 algo
-	return token.SignedString(jwtSecret) // This will seal it with secret key and send it so even if on wrong email, it won't work
+	return token.SignedString(jwtSecret)                       // This will seal it with secret key and send it so even if on wrong email, it won't work
 }
 
 func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {

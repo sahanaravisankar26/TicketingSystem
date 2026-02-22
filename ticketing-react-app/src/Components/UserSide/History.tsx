@@ -10,15 +10,8 @@ import { IoSearchSharp } from "react-icons/io5";
 import { EventSourcePolyfill } from "event-source-polyfill";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 import { CRUD } from "../../Contants/constants";
-
-interface Ticket {
-  id: string;
-  email: string;
-  issue: string;
-  description: string;
-  message: string;
-  state: string;
-}
+import { FetchUserHistoryEndpoint } from "../../Contants/routes";
+import type { Ticket } from "../../Contants/interfaceConstants";
 
 const History = ({ email }: { email: string }) => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -29,7 +22,7 @@ const History = ({ email }: { email: string }) => {
   const [viewModal, setViewModal] = useState(false);
 
   useEffect(() => {
-    const endpoint = `http://localhost:8080/fetch-history?email=${encodeURIComponent(email)}`;
+    const endpoint = FetchUserHistoryEndpoint(email);
     const eventSource = new EventSourcePolyfill(endpoint, {
       headers: {
         Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -51,8 +44,8 @@ const History = ({ email }: { email: string }) => {
           }
           return prev;
         });
-      } catch (err) {
-        toast.error("Parse error:" + err, DEFAULT_TOAST_OPTIONS);
+      } catch {
+        toast.error("Parse error", DEFAULT_TOAST_OPTIONS);
       }
     };
 
@@ -233,7 +226,7 @@ const History = ({ email }: { email: string }) => {
           isOpen={deleteModalOpen}
           onClose={() => setDeleteModalOpen(false)}
           id={selectedTicketId}
-          onDeleteSuccess={() =>
+          onSuccess={() =>
             selectedTicketId && refreshAfterDelete(selectedTicketId)
           }
         />

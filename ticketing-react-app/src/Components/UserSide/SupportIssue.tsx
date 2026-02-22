@@ -1,6 +1,8 @@
 import React, { useState } from "react";
-import { toast, Bounce } from "react-toastify";
+import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
+import { APIEndpoints } from "../../Contants/routes";
+import { Methods } from "../../Contants/constants";
 
 const SupportIssue = ({ email }: { email: string }) => {
   const [issue, setIssue] = useState("");
@@ -8,16 +10,16 @@ const SupportIssue = ({ email }: { email: string }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSubmitting(true);
     setSuccessMessage("");
 
-    const endpoint = "http://localhost:8080/submit-issue";
+    const endpoint = APIEndpoints.SubmitIssueTicketEndpoint;
 
     try {
       const result = await fetch(endpoint, {
-        method: "POST",
+        method: Methods.POST,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -52,9 +54,9 @@ const SupportIssue = ({ email }: { email: string }) => {
       setTimeout(() => {
         setSuccessMessage("");
       }, 5000);
-    } catch (err) {
+    } catch {
       toast.error(
-        "Failed to submit issue due to " + err + ". Please try again.",
+        "Failed to submit issue. Please try again.",
         DEFAULT_TOAST_OPTIONS,
       );
     } finally {

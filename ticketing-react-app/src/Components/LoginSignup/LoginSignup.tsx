@@ -3,7 +3,8 @@ import UserPage from "../UserSide/UserPage";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { Routes } from "../../Contants/routes";
+import { APIEndpoints, Routes } from "../../Contants/routes";
+import { Methods } from "../../Contants/constants";
 
 const LoginSignup = () => {
   const [isLoginMode, setIsLoginMode] = useState(true);
@@ -20,8 +21,8 @@ const LoginSignup = () => {
     if (savedUser && savedUser != undefined) {
       try {
         return JSON.parse(savedUser);
-      } catch (e) {
-        console.error("Failed to parse user", e);
+      } catch {
+        toast.error("Failed to get data", DEFAULT_TOAST_OPTIONS)
         return null;
       }
     }
@@ -34,15 +35,15 @@ const LoginSignup = () => {
     setUser(null);
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const endpoint = isLoginMode
-      ? "http://localhost:8080/login"
-      : "http://localhost:8080/signup";
+      ? APIEndpoints.UserLoginEndpoint
+      : APIEndpoints.UserSignupEndpoint;
 
     try {
       const result = await fetch(endpoint, {
-        method: "POST",
+        method: Methods.POST,
         headers: {
           "Content-Type": "application/json",
         },
@@ -68,8 +69,8 @@ const LoginSignup = () => {
 
       setEmail("");
       setPassword("");
-    } catch (error) {
-      toast.error("Error is " + error, DEFAULT_TOAST_OPTIONS);
+    } catch {
+      toast.error("Error in Login", DEFAULT_TOAST_OPTIONS);
     }
   };
 
