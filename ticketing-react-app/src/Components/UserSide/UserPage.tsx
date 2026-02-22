@@ -6,7 +6,7 @@ import SupportIssue from "./SupportIssue";
 import History from "./History";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { Routes as AppRoute } from "../../Contants/routes";
+import { APIEndpoints, Routes as AppRoute } from "../../Contants/routes";
 
 const UserPage = ({
   userData,
@@ -19,7 +19,7 @@ const UserPage = ({
     const token = localStorage.getItem("token");
     let runOnce = false;
 
-    fetch("http://localhost:8080/protected", {
+    fetch(APIEndpoints.GetUserPageEndpoint, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -30,8 +30,8 @@ const UserPage = ({
           toast.success(data.message, DEFAULT_TOAST_OPTIONS);
         }
       })
-      .catch((err) => {
-        console.error(err);
+      .catch(() => {
+        toast.error("Failed to fetch user data", DEFAULT_TOAST_OPTIONS);
       });
 
     return () => {

@@ -1,14 +1,9 @@
 import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
-
-interface EditModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  description: string;
-  id: string | null;
-  onUpdateSuccess: (newDesc: string) => void;
-}
+import { APIEndpoints } from "../../../Contants/routes";
+import type { ModalProps } from "../../../Contants/interfaceConstants";
+import { Methods } from "../../../Contants/constants";
 
 const EditModal = ({
   isOpen,
@@ -16,17 +11,17 @@ const EditModal = ({
   description,
   id,
   onUpdateSuccess,
-}: EditModalProps) => {
+}: ModalProps) => {
   const [value, setValue] = useState(description);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  const saveChanges = async (e) => {
+  const saveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsUpdating(true);
     try {
-      const endpoint = "http://localhost:8080/update-support";
+      const endpoint = APIEndpoints.UpdateTicketEndpoint;
       const res = await fetch(endpoint, {
-        method: "POST",
+        method: Methods.POST  ,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -41,10 +36,10 @@ const EditModal = ({
         toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }
-      onUpdateSuccess(value);
+      onUpdateSuccess?.(value);
       onClose();
-    } catch (err) {
-      toast.error("Error on updating due to: " + err, DEFAULT_TOAST_OPTIONS);
+    } catch {
+      toast.error("Error on updating", DEFAULT_TOAST_OPTIONS);
     } finally {
       setIsUpdating(false);
     }

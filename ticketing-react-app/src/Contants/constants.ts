@@ -3,3 +3,7 @@ export const CRUD = {
   Update: "UPDATE",
   Delete: "DELETE",
 };
+
+export const Methods = {
+    POST: "POST",
+}

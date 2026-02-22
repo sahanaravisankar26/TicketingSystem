@@ -3,6 +3,7 @@ import AdminModal from "../UserSide/Modals/AdminModal";
 import { IoSearchSharp } from "react-icons/io5";
 import type { Ticket } from "../../Contants/interfaceConstants";
 import { CRUD } from "../../Contants/constants";
+import { APIEndpoints } from "../../Contants/routes";
 
 const AdminPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -61,7 +62,7 @@ const AdminPage = () => {
 
   useEffect(() => {
     const eventSource = new EventSource(
-      "http://localhost:8080/fetch-all-tickets",
+      APIEndpoints.AdminGetAllTicketsEndpoint,
     );
 
     eventSource.onopen = () => {
@@ -162,7 +163,7 @@ const AdminPage = () => {
             tickets.find((ticket) => ticket.id === ticketSelected)?.issue || ""
           }
           id={ticketSelected}
-          onResolveSuccess={() =>
+          onSuccess={() =>
             ticketSelected && refreshAfterResolve(ticketSelected)
           }
         />

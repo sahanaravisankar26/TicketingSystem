@@ -9,7 +9,7 @@ const AdminLogin = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (
       username === import.meta.env.VITE_ADMIN &&
@@ -23,7 +23,7 @@ const AdminLogin = () => {
   };
 
   const gotoUser = () => {
-    navigate("/sign-in");
+    navigate(Routes.SignIn);
   };
 
   return (
