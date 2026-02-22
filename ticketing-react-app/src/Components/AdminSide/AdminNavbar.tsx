@@ -1,13 +1,10 @@
 import React from "react";
 import logo from "../../assets/logo.png";
-import { useNavigate } from "react-router-dom";
-import { Routes } from "../../Contants/routes";
+import { AppRoutes } from "../../Contants/routes";
+import { useNavigationService } from "../../hooks/useNavigationService";
 
 const AdminNavbar = () => {
-  const navigate = useNavigate();
-  const handleLogout = () => {
-    navigate(Routes.SignIn);
-  };
+  const goToPath = useNavigationService();
 
   return (
     <>
@@ -46,7 +43,7 @@ const AdminNavbar = () => {
           </button>
           <button
             type="button"
-            onClick={handleLogout}
+            onClick={() => goToPath(AppRoutes.SignIn)}
             className="text-white bg-red-600 hover:bg-red-700 shadow-xs font-medium text-sm px-4 py-2.5 rounded-xl cursor-pointer"
           >
             Logout

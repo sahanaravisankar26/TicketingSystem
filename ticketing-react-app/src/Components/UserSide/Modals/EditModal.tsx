@@ -21,7 +21,7 @@ const EditModal = ({
     try {
       const endpoint = APIEndpoints.UpdateTicketEndpoint;
       const res = await fetch(endpoint, {
-        method: Methods.POST  ,
+        method: Methods.POST,
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -36,7 +36,7 @@ const EditModal = ({
         toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }
-      onUpdateSuccess?.(value);
+      onUpdateSuccess?.(value ? value : "");
       onClose();
     } catch {
       toast.error("Error on updating", DEFAULT_TOAST_OPTIONS);

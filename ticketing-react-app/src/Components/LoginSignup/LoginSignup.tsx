@@ -1,20 +1,16 @@
 import React, { useState } from "react";
 import UserPage from "../UserSide/UserPage";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { APIEndpoints, Routes } from "../../Contants/routes";
+import { APIEndpoints, AppRoutes } from "../../Contants/routes";
 import { Methods } from "../../Contants/constants";
+import { useNavigationService } from "../../hooks/useNavigationService";
 
 const LoginSignup = () => {
+  const goToPath = useNavigationService();
   const [isLoginMode, setIsLoginMode] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-
-  const gotoAdmin = () => {
-    navigate(Routes.AdminLogin);
-  };
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedInUser");
@@ -147,7 +143,7 @@ const LoginSignup = () => {
             <p>
               If you're the admin,{" "}
               <span
-                onClick={gotoAdmin}
+                onClick={() => goToPath(AppRoutes.AdminLogin)}
                 className="text-orange-600 font-semibold hover:underline cursor-pointer"
               >
                 click here!

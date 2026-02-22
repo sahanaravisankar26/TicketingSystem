@@ -1,13 +1,13 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { Routes } from "../../Contants/routes";
+import { AppRoutes } from "../../Contants/routes";
+import { useNavigationService } from "../../hooks/useNavigationService";
 
 const AdminLogin = () => {
+  const goToPath = useNavigationService();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -16,14 +16,10 @@ const AdminLogin = () => {
       password === import.meta.env.VITE_PASSWORD
     ) {
       // Redirect to Admin Dashboard
-      navigate(Routes.AdminDashboard);
+      goToPath(AppRoutes.AdminDashboard);
     } else {
       toast.error("Invalid Admin Credentials", DEFAULT_TOAST_OPTIONS);
     }
-  };
-
-  const gotoUser = () => {
-    navigate(Routes.SignIn);
   };
 
   return (
@@ -61,7 +57,7 @@ const AdminLogin = () => {
           <p className="text-center text-sm text-gray-500 mt-2">
             If you're the user,{" "}
             <span
-              onClick={gotoUser}
+              onClick={() => goToPath(AppRoutes.SignIn)}
               className="text-orange-600 font-semibold hover:underline cursor-pointer"
             >
               click here!

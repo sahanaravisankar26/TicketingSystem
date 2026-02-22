@@ -4,9 +4,8 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Dashboard from "./Dashboard";
 import SupportIssue from "./SupportIssue";
 import History from "./History";
-import { toast } from "react-toastify";
-import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { APIEndpoints, Routes as AppRoute } from "../../Contants/routes";
+import { AppRoutes } from "../../Contants/routes";
+import { sessionValidationCheck } from "../../Services/authService";
 
 const UserPage = ({
   userData,
@@ -16,28 +15,8 @@ const UserPage = ({
   onLogout: () => void;
 }) => {
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    let runOnce = false;
-
-    fetch(APIEndpoints.GetUserPageEndpoint, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (runOnce) {
-          toast.success(data.message, DEFAULT_TOAST_OPTIONS);
-        }
-      })
-      .catch(() => {
-        toast.error("Failed to fetch user data", DEFAULT_TOAST_OPTIONS);
-      });
-
-    return () => {
-      runOnce = true;
-    };
-  }, []);
+    sessionValidationCheck(onLogout);
+  }, [onLogout]);
 
   return (
     <div className="pb-4 bg-white">
@@ -47,18 +26,18 @@ const UserPage = ({
       </h6>
       <Routes>
         <Route index element={<SupportIssue email={userData.email} />} />
-        <Route path={AppRoute.Dashboard} element={<Dashboard />} />
+        <Route path={AppRoutes.Dashboard} element={<Dashboard />} />
         <Route
-          path={AppRoute.Issue}
+          path={AppRoutes.Issue}
           element={<SupportIssue email={userData.email} />}
         />
         <Route
-          path={AppRoute.History}
+          path={AppRoutes.History}
           element={<History email={userData.email} />}
         />
         <Route
-          path={AppRoute.All}
-          element={<Navigate to={AppRoute.Issue} replace />}
+          path={AppRoutes.All}
+          element={<Navigate to={AppRoutes.Issue} replace />}
         />
       </Routes>
     </div>
