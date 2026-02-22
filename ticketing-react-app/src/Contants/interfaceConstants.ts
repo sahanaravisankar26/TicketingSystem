@@ -10,16 +10,10 @@ export interface Ticket {
 export interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  description: string;
+  description?: string;
   issue?: string;
   id: string | null;
   onSuccess?: () => void;
   onUpdateSuccess?: (newDesc: string) => void;
-}
-
-export interface DeleteModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  id: string;
-  onSuccess: () => void;
+  message?: string;
 }

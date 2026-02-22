@@ -11,12 +11,12 @@ import {
 } from "@heroicons/react/24/outline";
 import { useLocation } from "react-router-dom";
 import logo from "../../assets/logo.png";
-import { Routes } from "../../Contants/routes";
+import { AppRoutes } from "../../Contants/routes";
 
 const navigation = [
-  { name: "Dashboard", href: Routes.Dashboard },
-  { name: "Submit Issue", href: Routes.Issue },
-  { name: "History", href: Routes.History },
+  { name: "Dashboard", href: AppRoutes.Dashboard },
+  { name: "Submit Issue", href: AppRoutes.Issue },
+  { name: "History", href: AppRoutes.History },
 ];
 
 export default function Navbar({ onLogout }: { onLogout: () => void }) {

@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 import { APIEndpoints } from "../../../Contants/routes";
-import type { DeleteModalProps } from "../../../Contants/interfaceConstants";
+import type { ModalProps } from "../../../Contants/interfaceConstants";
 import { Methods } from "../../../Contants/constants";
 
 const DeleteModal = ({
@@ -10,7 +10,7 @@ const DeleteModal = ({
   onClose,
   id,
   onSuccess,
-}: DeleteModalProps) => {
+}: ModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -33,7 +33,7 @@ const DeleteModal = ({
         toast.error("Failed to delete the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }
-      onSuccess();
+      onSuccess?.();
       onClose();
     } catch (err) {
       toast.error("Error on delete due to: " + err, DEFAULT_TOAST_OPTIONS);

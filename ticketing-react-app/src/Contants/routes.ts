@@ -1,4 +1,4 @@
-export const Routes = {
+export const AppRoutes = {
   LoginSignup: "/",
   AdminLogin: "/admin-login",
   AdminDashboard: "/admin-dashboard",

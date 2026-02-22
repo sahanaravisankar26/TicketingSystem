@@ -1,12 +1,7 @@
 import React from "react";
+import type { ModalProps } from "../../../Contants/interfaceConstants";
 
-interface ResolvedModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  message: string;
-}
-
-const ResolvedModal = ({ isOpen, onClose, message }: ResolvedModalProps) => {
+const ResolvedModal = ({ isOpen, onClose, message }: ModalProps) => {
   if (!isOpen) return null;
   return (
     <>

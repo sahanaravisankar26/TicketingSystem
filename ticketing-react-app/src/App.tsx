@@ -5,17 +5,17 @@ import LoginSignup from "./Components/LoginSignup/LoginSignup";
 import { Route, Routes } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Routes as AppRoute } from "./Contants/routes";
+import { AppRoutes } from "./Contants/routes";
 
 function App() {
   return (
     <>
       <div className="grid h-screen bg-red-50">
         <Routes>
-          <Route path={AppRoute.AllPossible} element={<LoginSignup />} />
-          <Route path={AppRoute.SignInAll} element={<LoginSignup />} />
-          <Route path={AppRoute.AdminLoginAll} element={<AdminLogin />} />
-          <Route path={AppRoute.AdminDashboard} element={<AdminDashboard />} />
+          <Route path={AppRoutes.AllPossible} element={<LoginSignup />} />
+          <Route path={AppRoutes.SignInAll} element={<LoginSignup />} />
+          <Route path={AppRoutes.AdminLoginAll} element={<AdminLogin />} />
+          <Route path={AppRoutes.AdminDashboard} element={<AdminDashboard />} />
         </Routes>
       </div>
       <ToastContainer />

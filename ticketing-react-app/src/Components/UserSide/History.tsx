@@ -238,6 +238,7 @@ const History = ({ email }: { email: string }) => {
           message={
             tickets.find((t) => t.id === selectedTicketId)?.message || ""
           }
+          id={selectedTicketId}
         />
       </div>
     </>
