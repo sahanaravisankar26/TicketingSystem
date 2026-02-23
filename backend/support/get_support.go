@@ -76,7 +76,7 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 
 		clientChannel := make(chan constants.TicketEvent)
 		broker.Mu.Lock()
-		if broker.Users[email] == nil { // fail safe (most probably won't need it)
+		if broker.Users[email] == nil { // fail safe
 			broker.Users[email] = make(map[chan constants.TicketEvent]bool) // don't overwrite other open tabs for this user
 		}
 		broker.Users[email][clientChannel] = true
