@@ -10,7 +10,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
+func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		if r.Method == constants.MethodOptions {
@@ -49,6 +49,6 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 			return
 		}
 
-		broker.Broadcast(constants.UPDATE, ticket)
+		// broker.Broadcast(constants.UPDATE, ticket)
 	}
 }

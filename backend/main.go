@@ -58,7 +58,7 @@ func main() {
 	fmt.Println("Collections made")
 
 	r := mux.NewRouter()
-	var ticketBroker *support.Broker = support.NewBroker()
+	// var ticketBroker *support.Broker = support.NewBroker()
 
 	// SIGNUP
 	r.HandleFunc("/signup", signin.SignupHandler(user_collection))
@@ -70,19 +70,24 @@ func main() {
 	r.HandleFunc("/protected", middleware.JwtMiddleware(middleware.ProtectedHandler))
 
 	// SUPPORT ISSUE
-	r.HandleFunc("/submit-issue", middleware.JwtMiddleware(support.SendSupport(ticket_collection, ticketBroker)))
+	// r.HandleFunc("/submit-issue", middleware.JwtMiddleware(support.SendSupport(ticket_collection, ticketBroker)))
+	r.HandleFunc("/submit-issue", middleware.JwtMiddleware(support.SendSupport(ticket_collection)))
 
 	// FETCH SUPPORT ISSUES
-	r.HandleFunc("/fetch-history", middleware.JwtMiddleware(support.FetchSupport(ticket_collection, cluster, ticketBroker)))
-	// r.HandleFunc("/fetch-all-tickets", support.FetchAllSupport(ticket_collection, cluster))
-	r.HandleFunc("/fetch-all-tickets", ticketBroker.ServeAdminSSE(cluster))
+	// r.HandleFunc("/fetch-history", middleware.JwtMiddleware(support.FetchSupport(ticket_collection, cluster, ticketBroker)))
+	r.HandleFunc("/fetch-history", middleware.JwtMiddleware(support.FetchSupport(ticket_collection, cluster)))
+	r.HandleFunc("/fetch-all-tickets", support.FetchAllSupport(ticket_collection, cluster))
+	// r.HandleFunc("/fetch-all-tickets", ticketBroker.ServeAdminSSE(cluster))
 
 	// DELETE SUPPORT ISSUE
-	r.HandleFunc("/delete-support", middleware.JwtMiddleware(support.DeleteSupport(ticket_collection, ticketBroker)))
+	// r.HandleFunc("/delete-support", middleware.JwtMiddleware(support.DeleteSupport(ticket_collection, ticketBroker)))
+	r.HandleFunc("/delete-support", middleware.JwtMiddleware(support.DeleteSupport(ticket_collection)))
 
 	// UPDATE SUPPORT ISSUE
-	r.HandleFunc("/update-support", middleware.JwtMiddleware(support.UpdateSupport(ticket_collection, cluster, ticketBroker)))
-	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster, ticketBroker))
+	// r.HandleFunc("/update-support", middleware.JwtMiddleware(support.UpdateSupport(ticket_collection, cluster, ticketBroker)))
+	// r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster, ticketBroker))
+	r.HandleFunc("/update-support", middleware.JwtMiddleware(support.UpdateSupport(ticket_collection, cluster)))
+	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster))
 
 	fmt.Println("Server starting on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r))
