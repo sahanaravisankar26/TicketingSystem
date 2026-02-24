@@ -3,6 +3,7 @@ package support
 import (
 	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/kafka"
 	"capella-auth/response"
 	"encoding/json"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
+func DeleteSupport(collection *gocb.Collection, producer *kafka.Producer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		if r.Method == constants.MethodOptions {
@@ -35,6 +36,9 @@ func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc
 			return
 		}
 
-		broker.Broadcast(constants.DELETE, constants.Issue{Id: id.DocId})
+		producer.Publish(constants.TicketEvent {
+			Action: constants.DELETE,
+			Ticket: constants.Issue{Id: id.DocId},
+		})
 	}
 }

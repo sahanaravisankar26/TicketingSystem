@@ -3,6 +3,7 @@ package support
 import (
 	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/kafka"
 	"capella-auth/response"
 	"encoding/json"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
+func SendSupport(collection *gocb.Collection, producer *kafka.Producer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		w.Header().Set(constants.ContentType, constants.ApplicationJSON)
@@ -47,6 +48,10 @@ func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "Your issue has been successfully submitted. Stay tuned for updates!",
 		})
-		broker.Broadcast(constants.CREATE, issue)
+
+		producer.Publish(constants.TicketEvent{
+			Action: constants.CREATE,
+			Ticket: issue,
+		})
 	}
 }
