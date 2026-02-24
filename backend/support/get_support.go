@@ -11,7 +11,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
+func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		cors.SetSSEHeader(&w)
@@ -75,46 +75,46 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 			flusher.Flush()
 		}
 
-		clientChannel := make(chan constants.TicketEvent)
-		broker.Mu.Lock()
-		if broker.Users[email] == nil { // fail safe
-			broker.Users[email] = make(map[chan constants.TicketEvent]bool) // don't overwrite other open tabs for this user
-		}
-		broker.Users[email][clientChannel] = true
-		broker.Mu.Unlock()
+		// clientChannel := make(chan constants.TicketEvent)
+		// broker.Mu.Lock()
+		// if broker.Users[email] == nil { // fail safe
+		// 	broker.Users[email] = make(map[chan constants.TicketEvent]bool) // don't overwrite other open tabs for this user
+		// }
+		// broker.Users[email][clientChannel] = true
+		// broker.Mu.Unlock()
 
-		defer func() {
-			broker.Mu.Lock()
-			delete(broker.Users[email], clientChannel)
-			broker.Mu.Unlock()
-		}()
+		// defer func() {
+		// 	broker.Mu.Lock()
+		// 	delete(broker.Users[email], clientChannel)
+		// 	broker.Mu.Unlock()
+		// }()
 
-		for {
-			select {
-			case event := <-clientChannel:
-				msg, _ := json.Marshal(event)
-				fmt.Fprintf(w, "data: %s\n\n", msg)
-				flusher.Flush()
-			case <-r.Context().Done():
-				return
-			}
-		}
-
-		// var tickets []Issue
-		// for res.Next() {
-		// 	var ticket Issue
-		// 	if err := res.Row(&ticket); err != nil {
-		// 		http.Error(w, "Row mapping failed", constants.StatusInternalServerError)
+		// for {
+		// 	select {
+		// 	case event := <-clientChannel:
+		// 		msg, _ := json.Marshal(event)
+		// 		fmt.Fprintf(w, "data: %s\n\n", msg)
+		// 		flusher.Flush()
+		// 	case <-r.Context().Done():
 		// 		return
 		// 	}
-		// 	ticketMarshal, _ := json.Marshal(ticket) // make it to json because my eventsource needs in such format
-		// 	fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
-		// 	flusher.Flush() // Flush after each ticket
-		// tickets = append(tickets, ticket)
 		// }
 
-		// w.Header().Set("Content-Type", "application/json")
-		// json.NewEncoder(w).Encode(tickets)
+		var tickets []constants.Issue
+		for res.Next() {
+			var ticket constants.Issue
+			if err := res.Row(&ticket); err != nil {
+				http.Error(w, "Row mapping failed", constants.StatusInternalServerError)
+				return
+			}
+			ticketMarshal, _ := json.Marshal(ticket) // make it to json because my eventsource needs in such format
+			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
+			flusher.Flush() // Flush after each ticket
+		tickets = append(tickets, ticket)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(tickets)
 	}
 }
 
