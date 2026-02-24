@@ -1,9 +1,13 @@
 package main
 
 import (
+	"capella-auth/constants"
+	"capella-auth/kafka"
 	"capella-auth/middleware"
 	"capella-auth/signin"
 	"capella-auth/support"
+	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
@@ -60,6 +64,23 @@ func main() {
 	r := mux.NewRouter()
 	var ticketBroker *support.Broker = support.NewBroker()
 
+	kafkaProducer, err := kafka.NewProducer("localhost:9092", "ticket-events")
+	if err != nil {
+		log.Fatal(err)
+	}
+	kafkaConsumer, err := kafka.NewConsumer("localhost:9092", "ticket-group", "ticket-events")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx := context.Background()
+	go kafkaConsumer.Start(ctx, func(msg []byte) {
+		var event constants.TicketEvent
+		json.Unmarshal(msg, &event)
+		ticketBroker.Broadcast(event.Action, event.Ticket)
+		ticketBroker.NotifyUser(event.Ticket.Email, event.Action, event.Ticket)
+	})
+
 	// SIGNUP
 	r.HandleFunc("/signup", signin.SignupHandler(user_collection))
 
@@ -70,7 +91,7 @@ func main() {
 	r.HandleFunc("/protected", middleware.JwtMiddleware(middleware.ProtectedHandler))
 
 	// SUPPORT ISSUE
-	r.HandleFunc("/submit-issue", middleware.JwtMiddleware(support.SendSupport(ticket_collection, ticketBroker)))
+	r.HandleFunc("/submit-issue", middleware.JwtMiddleware(support.SendSupport(ticket_collection, kafkaProducer)))
 
 	// FETCH SUPPORT ISSUES
 	r.HandleFunc("/fetch-history", middleware.JwtMiddleware(support.FetchSupport(ticket_collection, cluster, ticketBroker)))
@@ -78,11 +99,11 @@ func main() {
 	r.HandleFunc("/fetch-all-tickets", ticketBroker.ServeAdminSSE(cluster))
 
 	// DELETE SUPPORT ISSUE
-	r.HandleFunc("/delete-support", middleware.JwtMiddleware(support.DeleteSupport(ticket_collection, ticketBroker)))
+	r.HandleFunc("/delete-support", middleware.JwtMiddleware(support.DeleteSupport(ticket_collection, kafkaProducer)))
 
 	// UPDATE SUPPORT ISSUE
-	r.HandleFunc("/update-support", middleware.JwtMiddleware(support.UpdateSupport(ticket_collection, cluster, ticketBroker)))
-	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster, ticketBroker))
+	r.HandleFunc("/update-support", middleware.JwtMiddleware(support.UpdateSupport(ticket_collection, cluster, kafkaProducer)))
+	r.HandleFunc("/admin-updates", support.UpdatedByAdmin(ticket_collection, cluster, kafkaProducer))
 
 	fmt.Println("Server starting on http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", r))

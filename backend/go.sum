@@ -1,3 +1,5 @@
+github.com/confluentinc/confluent-kafka-go/v2 v2.13.0 h1:y9wh3z7FdqN3RJ9IHW12hzytJx4KjlpviPWn4ncA5u0=
+github.com/confluentinc/confluent-kafka-go/v2 v2.13.0/go.mod h1:aR1aciwbULyLhKkv9eq88JhS4XmGOusEnHZx1R93XZI=
 github.com/couchbase/gocb/v2 v2.11.2 h1:X1OehLza5K0/eA9bqj/JDpYTCEXGo26kpt+JjPlMQhg=
 github.com/couchbase/gocb/v2 v2.11.2/go.mod h1:hGsgT245OCuB1g+iVJ1UxD9GeMz08/q7xBnFKC6qXwM=
 github.com/couchbase/gocbcore/v10 v10.8.1 h1:i4SnH0DH9APGC4GS2vS2m+3u08V7oJwviamOXdgAZOQ=

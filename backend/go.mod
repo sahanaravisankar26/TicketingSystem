@@ -10,6 +10,7 @@ require (
 )
 
 require (
+	github.com/confluentinc/confluent-kafka-go/v2 v2.13.0 // indirect
 	github.com/couchbase/gocbcore/v10 v10.8.1 // indirect
 	github.com/couchbase/gocbcoreps v0.1.5-0.20260107140814-1c3a03f888f8 // indirect
 	github.com/couchbase/goprotostellar v1.0.5 // indirect

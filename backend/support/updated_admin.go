@@ -3,6 +3,7 @@ package support
 import (
 	"capella-auth/constants"
 	"capella-auth/cors"
+	"capella-auth/kafka"
 	"capella-auth/response"
 	"encoding/json"
 	"net/http"
@@ -10,7 +11,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *Broker) http.HandlerFunc {
+func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, producer *kafka.Producer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		if r.Method == constants.MethodOptions {
@@ -37,8 +38,12 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *
 		var tickets constants.Issue
 		if err == nil && res.Next() {
 			res.Row(&tickets)
-			broker.Broadcast(constants.UPDATE, tickets)
-			broker.NotifyUser(tickets.Email, constants.UPDATE, tickets)
+			// broker.Broadcast(constants.UPDATE, tickets)
+			// broker.NotifyUser(tickets.Email, constants.UPDATE, tickets)
+			producer.Publish(constants.TicketEvent {
+				Action: constants.UPDATE,
+				Ticket: tickets,
+			})
 		}
 
 		if err != nil {
