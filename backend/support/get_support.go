@@ -34,7 +34,8 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		// }
 
 		// SSE started
-		email := r.URL.Query().Get("email")
+		// email := r.URL.Query().Get("email")
+		email := r.Context().Value("email").(string)
 		if email == "" {
 			response.RespondWithError(w, constants.ErrMailNeeded, constants.StatusBadRequest)
 			return

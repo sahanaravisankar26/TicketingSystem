@@ -4,6 +4,7 @@ import (
 	"capella-auth/constants"
 	"capella-auth/cors"
 	"capella-auth/response"
+	"context"
 	"encoding/json"
 	"net/http"
 	"time"
@@ -47,12 +48,25 @@ func JwtMiddleware(next http.HandlerFunc) http.HandlerFunc {
 			return
 		}
 
+		claims, ok := token.Claims.(jwt.MapClaims);
+		if !ok {
+			response.RespondWithError(w, constants.ErrInvalidToken, constants.StatusUnauthorized)
+			return
+		}
+
+		email := claims["email"].(string)
+		ctx := r.Context()
+		ctx = context.WithValue(ctx, "email", email)
+		r = r.WithContext(ctx)
+
 		next(w, r)
 	}
 }
 
 func ProtectedHandler(w http.ResponseWriter, r *http.Request) {
+	email := r.Context().Value("email").(string)
 	json.NewEncoder(w).Encode(map[string]string{
 		"message": "Welcome!",
+		"email": email,
 	})
 }

@@ -24,7 +24,9 @@ func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 			return
 		}
 
+		email := r.Context().Value("email").(string)
 		var issue constants.Issue
+		issue.Email = email
 		err := json.NewDecoder(r.Body).Decode(&issue)
 		if err != nil {
 			response.RespondWithError(w, constants.ErrInvalidRequestBody, constants.StatusBadRequest)
