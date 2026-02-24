@@ -4,7 +4,7 @@ import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 import { APIEndpoints } from "../../Contants/routes";
 import { Methods } from "../../Contants/constants";
 
-const SupportIssue = ({ email }: { email: string }) => {
+const SupportIssue = () => {
   const [issue, setIssue] = useState("");
   const [details, setDetails] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -26,7 +26,6 @@ const SupportIssue = ({ email }: { email: string }) => {
         },
         body: JSON.stringify({
           id: Date.now().toString(),
-          email,
           issue,
           description: details,
           message: "",

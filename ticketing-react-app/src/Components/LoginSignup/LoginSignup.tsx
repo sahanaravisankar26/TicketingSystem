@@ -25,12 +25,6 @@ const LoginSignup = () => {
     return null;
   });
 
-  const handleLogout = () => {
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("token");
-    setUser(null);
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const endpoint = isLoginMode
@@ -71,7 +65,7 @@ const LoginSignup = () => {
   };
 
   if (user) {
-    return <UserPage userData={user} onLogout={handleLogout} />;
+    return <UserPage userData={user} setUser={setUser} />;
   }
 
   return (
