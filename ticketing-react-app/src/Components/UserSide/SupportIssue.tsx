@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 import { APIEndpoints } from "../../Contants/routes";
-import { Methods } from "../../Contants/constants";
+// import { Methods } from "../../Contants/constants";
+import { apiFetch } from "../../utils/apiFetch";
+import type { UserTicketSubmit } from "../../Contants/interfaceConstants";
 
 const SupportIssue = () => {
   const [issue, setIssue] = useState("");
@@ -18,12 +20,23 @@ const SupportIssue = () => {
     const endpoint = APIEndpoints.SubmitIssueTicketEndpoint;
 
     try {
-      const result = await fetch(endpoint, {
-        method: Methods.POST,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
+      // const result = await fetch(endpoint, {
+      //   method: Methods.POST,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      //   body: JSON.stringify({
+      //     id: Date.now().toString(),
+      //     issue,
+      //     description: details,
+      //     message: "",
+      //     state: "Pending...",
+      //   }),
+      // });
+      const result = await apiFetch<UserTicketSubmit>({
+        endpoint,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         body: JSON.stringify({
           id: Date.now().toString(),
           issue,
@@ -32,14 +45,12 @@ const SupportIssue = () => {
           state: "Pending...",
         }),
       });
+      if (!result) return;
 
-      const data = await result.json();
+      const { response, data } = result;
 
-      if (!result.ok) {
-        toast.error(
-          data.error || "Something went wrong",
-          DEFAULT_TOAST_OPTIONS,
-        );
+      if (!response.ok) {
+        toast.error("Something went wrong", DEFAULT_TOAST_OPTIONS);
         setIsSubmitting(false);
         return;
       }
