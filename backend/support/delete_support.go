@@ -10,7 +10,7 @@ import (
 	"github.com/couchbase/gocb/v2"
 )
 
-func DeleteSupport(collection *gocb.Collection) http.HandlerFunc {
+func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		cors.EnableCORS(&w)
 		if r.Method == constants.MethodOptions {
@@ -35,6 +35,6 @@ func DeleteSupport(collection *gocb.Collection) http.HandlerFunc {
 			return
 		}
 
-		// broker.Broadcast(constants.DELETE, constants.Issue{Id: id.DocId})
+		broker.Broadcast(constants.DELETE, constants.Issue{Id: id.DocId})
 	}
 }
