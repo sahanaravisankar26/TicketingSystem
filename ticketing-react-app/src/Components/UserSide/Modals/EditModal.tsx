@@ -2,8 +2,12 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 import { APIEndpoints } from "../../../Contants/routes";
-import type { ModalProps } from "../../../Contants/interfaceConstants";
-import { Methods } from "../../../Contants/constants";
+import type {
+  EditModalUserResponse,
+  ModalProps,
+} from "../../../Contants/interfaceConstants";
+// import { Methods } from "../../../Contants/constants";
+import { apiFetch } from "../../../utils/apiFetch";
 
 const EditModal = ({
   isOpen,
@@ -20,19 +24,24 @@ const EditModal = ({
     setIsUpdating(true);
     try {
       const endpoint = APIEndpoints.UpdateTicketEndpoint;
-      const res = await fetch(endpoint, {
-        method: Methods.POST,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          id,
-          description: value,
-        }),
+      // const res = await fetch(endpoint, {
+      //   method: Methods.POST,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      //   body: JSON.stringify({
+      //     id,
+      //     description: value,
+      //   }),
+      // });
+      const res = await apiFetch<EditModalUserResponse>({
+        endpoint,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        body: JSON.stringify({ id, description: value }),
       });
 
-      if (!res.ok) {
+      if (!res) {
         toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }

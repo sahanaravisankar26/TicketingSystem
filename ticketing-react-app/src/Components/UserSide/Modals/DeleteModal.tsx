@@ -3,14 +3,10 @@ import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 import { APIEndpoints } from "../../../Contants/routes";
 import type { ModalProps } from "../../../Contants/interfaceConstants";
-import { Methods } from "../../../Contants/constants";
+// import { Methods } from "../../../Contants/constants";
+import { apiFetch } from "../../../utils/apiFetch";
 
-const DeleteModal = ({
-  isOpen,
-  onClose,
-  id,
-  onSuccess,
-}: ModalProps) => {
+const DeleteModal = ({ isOpen, onClose, id, onSuccess }: ModalProps) => {
   const [isDeleting, setIsDeleting] = useState(false);
 
   const handleDelete = async () => {
@@ -18,18 +14,23 @@ const DeleteModal = ({
     setIsDeleting(true);
     try {
       const endpoint = APIEndpoints.DeleteTicketEndpoint;
-      const res = await fetch(endpoint, {
-        method: Methods.POST,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("token")}`,
-        },
-        body: JSON.stringify({
-          id,
-        }),
+      // const res = await fetch(endpoint, {
+      //   method: Methods.POST,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+      //   },
+      //   body: JSON.stringify({
+      //     id,
+      //   }),
+      // });
+      const res = await apiFetch<{ id: string }>({
+        endpoint,
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        body: JSON.stringify({ id }),
       });
 
-      if (!res.ok) {
+      if (!res) {
         toast.error("Failed to delete the ticket", DEFAULT_TOAST_OPTIONS);
         return;
       }

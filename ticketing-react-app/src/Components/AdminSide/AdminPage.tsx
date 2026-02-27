@@ -101,7 +101,7 @@ const AdminPage = () => {
 
         {tickets.length === 0 ? (
           <p className="text-gray-500 text-center">
-            No Tickets Raised [Yet :)]
+            No Tickets Raised
           </p>
         ) : (
           <div className="flex flex-col gap-4">

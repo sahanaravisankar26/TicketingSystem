@@ -3,8 +3,9 @@ import UserPage from "../UserSide/UserPage";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 import { APIEndpoints, AppRoutes } from "../../Contants/routes";
-import { Methods } from "../../Contants/constants";
 import { useNavigationService } from "../../hooks/useNavigationService";
+import { apiFetch } from "../../utils/apiFetch";
+import { type LoginResponse } from "../../Contants/interfaceConstants";
 
 const LoginSignup = () => {
   const goToPath = useNavigationService();
@@ -18,7 +19,7 @@ const LoginSignup = () => {
       try {
         return JSON.parse(savedUser);
       } catch {
-        toast.error("Failed to get data", DEFAULT_TOAST_OPTIONS)
+        toast.error("Failed to get data", DEFAULT_TOAST_OPTIONS);
         return null;
       }
     }
@@ -32,20 +33,29 @@ const LoginSignup = () => {
       : APIEndpoints.UserSignupEndpoint;
 
     try {
-      const result = await fetch(endpoint, {
-        method: Methods.POST,
-        headers: {
-          "Content-Type": "application/json",
-        },
+      // const response = await fetch(endpoint, {
+      //   method: Methods.POST,
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //   },
+      //   body: JSON.stringify({
+      //     email,
+      //     password,
+      //   }),
+      // });
+
+      const result = await apiFetch<LoginResponse>({
+        endpoint,
         body: JSON.stringify({
           email,
           password,
         }),
       });
+      if (!result) return; 
+      // const data = await response.json();
+      const {response, data} = result;
 
-      const data = await result.json();
-
-      if (!result.ok) {
+      if (!response.ok) {
         toast.error(
           data.error || "Something went wrong",
           DEFAULT_TOAST_OPTIONS,
@@ -53,7 +63,7 @@ const LoginSignup = () => {
         return;
       }
 
-      localStorage.setItem("loggedInUser", JSON.stringify(data.user));
+      localStorage.setItem("loggedInUser", JSON.stringify(data.user.email));
       localStorage.setItem("token", data.token);
       setUser(data.user);
 
