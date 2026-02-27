@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import AdminModal from "../UserSide/Modals/AdminModal";
 import { IoSearchSharp } from "react-icons/io5";
 import type { Ticket } from "../../Contants/interfaceConstants";
-// import { CRUD } from "../../Contants/constants";
-// import { APIEndpoints } from "../../Contants/routes";
+import { CRUD } from "../../Contants/constants";
+import { APIEndpoints } from "../../Contants/routes";
 
 const AdminPage = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
@@ -33,62 +33,62 @@ const AdminPage = () => {
   //   }
   // };
 
-  useEffect(() => {
-    const endpoint = `http://localhost:8080/fetch-all-tickets`;
-    const eventSource = new EventSource(endpoint);
-
-    eventSource.onmessage = (event) => {
-      try {
-        const newTicket = JSON.parse(event.data);
-        setTickets((prev) => [newTicket, ...prev]);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    eventSource.onopen = () => {
-      setLoadingState(false);
-    };
-
-    eventSource.onerror = () => {
-      eventSource.close();
-      setLoadingState(false);
-    };
-
-    return () => {
-      eventSource.close();
-    };
-  }, []);
-
   // useEffect(() => {
-  //   const eventSource = new EventSource(
-  //     APIEndpoints.AdminGetAllTicketsEndpoint,
-  //   );
+  //   const endpoint = `http://localhost:8080/fetch-all-tickets`;
+  //   const eventSource = new EventSource(endpoint);
+
+  //   eventSource.onmessage = (event) => {
+  //     try {
+  //       const newTicket = JSON.parse(event.data);
+  //       setTickets((prev) => [newTicket, ...prev]);
+  //     } catch (err) {
+  //       console.log(err);
+  //     }
+  //   };
 
   //   eventSource.onopen = () => {
   //     setLoadingState(false);
   //   };
 
-  //   eventSource.onmessage = (event) => {
-  //     const { action, ticket } = JSON.parse(event.data);
-  //     setTickets((prev) => {
-  //       if (action === CRUD.Create) {
-  //         const duplicate = prev.find((t) => t.id === ticket.id);
-  //         if (duplicate) return prev;
-  //         return [ticket, ...prev];
-  //       } else if (action === CRUD.Delete) {
-  //         return prev.filter((t) => t.id !== ticket.id);
-  //       } else if (action === CRUD.Update) {
-  //         return prev.map((t) =>
-  //           t.id === ticket.id ? { ...t, ...ticket } : t,
-  //         );
-  //       }
-  //       return prev;
-  //     });
+  //   eventSource.onerror = () => {
+  //     eventSource.close();
+  //     setLoadingState(false);
   //   };
 
-  //   return () => eventSource.close();
+  //   return () => {
+  //     eventSource.close();
+  //   };
   // }, []);
+
+  useEffect(() => {
+    const eventSource = new EventSource(
+      APIEndpoints.AdminGetAllTicketsEndpoint,
+    );
+
+    eventSource.onopen = () => {
+      setLoadingState(false);
+    };
+
+    eventSource.onmessage = (event) => {
+      const { action, ticket } = JSON.parse(event.data);
+      setTickets((prev) => {
+        if (action === CRUD.Create) {
+          const duplicate = prev.find((t) => t.id === ticket.id);
+          if (duplicate) return prev;
+          return [ticket, ...prev];
+        } else if (action === CRUD.Delete) {
+          return prev.filter((t) => t.id !== ticket.id);
+        } else if (action === CRUD.Update) {
+          return prev.map((t) =>
+            t.id === ticket.id ? { ...t, ...ticket } : t,
+          );
+        }
+        return prev;
+      });
+    };
+
+    return () => eventSource.close();
+  }, []);
 
   if (loadingState)
     return <div className="text-center mt-10">Loading history...</div>;
