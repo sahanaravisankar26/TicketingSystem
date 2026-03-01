@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import { toast } from "react-toastify";
-import { DEFAULT_TOAST_OPTIONS } from "../../../Contants/toastConstant";
 import { APIEndpoints } from "../../../Contants/routes";
 import type {
   EditModalUserResponse,
@@ -22,36 +20,34 @@ const EditModal = ({
   const saveChanges = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsUpdating(true);
-    try {
-      const endpoint = APIEndpoints.UpdateTicketEndpoint;
-      // const res = await fetch(endpoint, {
-      //   method: Methods.POST,
-      //   headers: {
-      //     "Content-Type": "application/json",
-      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      //   body: JSON.stringify({
-      //     id,
-      //     description: value,
-      //   }),
-      // });
-      const res = await apiFetch<EditModalUserResponse>({
-        endpoint,
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        body: JSON.stringify({ id, description: value }),
-      });
+    // const res = await fetch(endpoint, {
+    //   method: Methods.POST,
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //     Authorization: `Bearer ${localStorage.getItem("token")}`,
+    //   },
+    //   body: JSON.stringify({
+    //     id,
+    //     description: value,
+    //   }),
+    // });
+    const res = await apiFetch<EditModalUserResponse>({
+      endpoint: APIEndpoints.UpdateTicketEndpoint,
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      body: JSON.stringify({ id, description: value }),
+    });
 
-      if (!res) {
-        toast.error("Failed to update the ticket", DEFAULT_TOAST_OPTIONS);
-        return;
-      }
-      onUpdateSuccess?.(value ? value : "");
-      onClose();
-    } catch {
-      toast.error("Error on updating", DEFAULT_TOAST_OPTIONS);
-    } finally {
+    // If res is null, apiFetch already showed a specific toast.
+    // We just stop execution here.
+    if (!res) {
       setIsUpdating(false);
+      return;
     }
+
+    // Success!
+    onUpdateSuccess?.(value || "");
+    onClose();
+    setIsUpdating(false);
   };
 
   if (!isOpen) return null;
