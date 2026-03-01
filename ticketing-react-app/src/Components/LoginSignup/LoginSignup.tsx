@@ -75,7 +75,7 @@ const LoginSignup = () => {
   };
 
   if (user) {
-    return <UserPage userData={user} setUser={setUser} />;
+    return <UserPage setUser={setUser} />;
   }
 
   return (

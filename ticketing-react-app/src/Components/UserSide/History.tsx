@@ -13,7 +13,7 @@ import { CRUD } from "../../Contants/constants";
 import { FetchUserHistoryEndpoint } from "../../Contants/routes";
 import type { Ticket } from "../../Contants/interfaceConstants";
 
-const History = ({ email }: { email: string }) => {
+const History = () => {
   const [tickets, setTickets] = useState<Ticket[]>([]);
   const [loadingState, setLoadingState] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -22,6 +22,7 @@ const History = ({ email }: { email: string }) => {
   const [viewModal, setViewModal] = useState(false);
 
   useEffect(() => {
+    const email = JSON.parse(localStorage.getItem("loggedInUser") || "null");
     const endpoint = FetchUserHistoryEndpoint(email);
     const eventSource = new EventSourcePolyfill(endpoint, {
       headers: {
@@ -61,7 +62,7 @@ const History = ({ email }: { email: string }) => {
     return () => {
       eventSource.close();
     };
-  }, [email]); // Only re-runs if the email actually changes
+  }, []); // Only re-runs if the email actually changes
 
   // const getHistory = () => {
   // removed async since sse is even based
