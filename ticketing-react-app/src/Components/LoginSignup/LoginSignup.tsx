@@ -53,7 +53,7 @@ const LoginSignup = () => {
         return;
       }
 
-      localStorage.setItem("loggedInUser", JSON.stringify(data.user));
+      localStorage.setItem("loggedInUser", JSON.stringify(data.user.email));
       localStorage.setItem("token", data.token);
       setUser(data.user);
 
@@ -65,7 +65,7 @@ const LoginSignup = () => {
   };
 
   if (user) {
-    return <UserPage userData={user} setUser={setUser} />;
+    return <UserPage setUser={setUser} />;
   }
 
   return (

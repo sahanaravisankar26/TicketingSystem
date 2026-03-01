@@ -7,7 +7,7 @@ import History from "./History";
 import { AppRoutes } from "../../Contants/routes";
 import { sessionValidationCheck } from "../../Services/authService";
 
-const UserPage = ({ userData, setUser }: { userData: { email: string }, setUser: React.Dispatch<React.SetStateAction<{ email: string } | null>> }) => {
+const UserPage = ({ setUser }: { setUser: React.Dispatch<React.SetStateAction<{ email: string } | null>> }) => {
   const handleLogout = useCallback(() => {
     localStorage.removeItem("loggedInUser");
     localStorage.removeItem("token");
@@ -22,7 +22,7 @@ const UserPage = ({ userData, setUser }: { userData: { email: string }, setUser:
     <div className="pb-4 bg-white">
       <Navbar onLogout={handleLogout} />
       <h6 className="text-2xl font-bold text-center mt-4">
-        Welcome {userData.email}!
+        Welcome {JSON.parse(localStorage.getItem("loggedInUser") || "null")}!
       </h6>
       <Routes>
         <Route index element={<SupportIssue />} />
@@ -30,7 +30,7 @@ const UserPage = ({ userData, setUser }: { userData: { email: string }, setUser:
         <Route path={AppRoutes.Issue} element={<SupportIssue />} />
         <Route
           path={AppRoutes.History}
-          element={<History email={userData.email} />}
+          element={<History />}
         />
         <Route
           path={AppRoutes.All}

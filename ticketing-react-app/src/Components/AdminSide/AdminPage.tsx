@@ -1,13 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import AdminModal from "../UserSide/Modals/AdminModal";
 import { IoSearchSharp } from "react-icons/io5";
-import type { Ticket } from "../../Contants/interfaceConstants";
-import { CRUD } from "../../Contants/constants";
 import { APIEndpoints } from "../../Contants/routes";
+import { useTicketEventsAdmin } from "../../hooks/useTicketEventsAdmin";
 
 const AdminPage = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loadingState, setLoadingState] = useState(true);
+  const { tickets, setTickets, loadingState } = useTicketEventsAdmin(APIEndpoints.AdminGetAllTicketsEndpoint);
   const [ticketSelected, setTicketSelected] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
@@ -59,36 +57,6 @@ const AdminPage = () => {
   //     eventSource.close();
   //   };
   // }, []);
-
-  useEffect(() => {
-    const eventSource = new EventSource(
-      APIEndpoints.AdminGetAllTicketsEndpoint,
-    );
-
-    eventSource.onopen = () => {
-      setLoadingState(false);
-    };
-
-    eventSource.onmessage = (event) => {
-      const { action, ticket } = JSON.parse(event.data);
-      setTickets((prev) => {
-        if (action === CRUD.Create) {
-          const duplicate = prev.find((t) => t.id === ticket.id);
-          if (duplicate) return prev;
-          return [ticket, ...prev];
-        } else if (action === CRUD.Delete) {
-          return prev.filter((t) => t.id !== ticket.id);
-        } else if (action === CRUD.Update) {
-          return prev.map((t) =>
-            t.id === ticket.id ? { ...t, ...ticket } : t,
-          );
-        }
-        return prev;
-      });
-    };
-
-    return () => eventSource.close();
-  }, []);
 
   if (loadingState)
     return <div className="text-center mt-10">Loading history...</div>;
