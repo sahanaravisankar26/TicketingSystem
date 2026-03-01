@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { toast } from "react-toastify";
 import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
 import { APIEndpoints } from "../../Contants/routes";
-// import { Methods } from "../../Contants/constants";
 import { apiFetch } from "../../utils/apiFetch";
 import type { UserTicketSubmit } from "../../Contants/interfaceConstants";
 
@@ -58,7 +57,7 @@ const SupportIssue = () => {
       // Clear the form on success
       setIssue("");
       setDetails("");
-      setSuccessMessage(data.message || "Issue submitted successfully!");
+      setSuccessMessage(data?.message || "Issue submitted successfully!");
 
       // Clear success message after 5 seconds
       setTimeout(() => {

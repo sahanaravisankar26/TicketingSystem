@@ -57,15 +57,15 @@ const LoginSignup = () => {
 
       if (!response.ok) {
         toast.error(
-          data.error || "Something went wrong",
+          "Something went wrong",
           DEFAULT_TOAST_OPTIONS,
         );
         return;
       }
 
-      localStorage.setItem("loggedInUser", JSON.stringify(data.user.email));
-      localStorage.setItem("token", data.token);
-      setUser(data.user);
+      localStorage.setItem("loggedInUser", JSON.stringify(data?.user.email));
+      localStorage.setItem("token", JSON.stringify(data?.token));
+      setUser(data?.user);
 
       setEmail("");
       setPassword("");
