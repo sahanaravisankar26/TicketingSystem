@@ -22,7 +22,7 @@ const UserPage = ({ setUser }: { setUser: React.Dispatch<React.SetStateAction<{ 
     <div className="pb-4 bg-white">
       <Navbar onLogout={handleLogout} />
       <h6 className="text-2xl font-bold text-center mt-4">
-        Welcome {JSON.parse(localStorage.getItem("loggedInUser") || "null")}!
+        Welcome {JSON.parse(localStorage.getItem("loggedInUser") || "{}").email}!
       </h6>
       <Routes>
         <Route index element={<SupportIssue />} />
