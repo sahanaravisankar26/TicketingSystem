@@ -15,15 +15,13 @@ const LoginSignup = () => {
 
   const [user, setUser] = useState(() => {
     const savedUser = localStorage.getItem("loggedInUser");
-    if (savedUser && savedUser != undefined) {
-      try {
-        return JSON.parse(savedUser);
-      } catch {
-        toast.error("Failed to get data", DEFAULT_TOAST_OPTIONS);
-        return null;
-      }
+    if (!savedUser || savedUser === "undefined") return null;
+    try {
+      return JSON.parse(savedUser);
+    } catch {
+      toast.error("Failed to get data", DEFAULT_TOAST_OPTIONS);
+      return null;
     }
-    return null;
   });
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -51,21 +49,23 @@ const LoginSignup = () => {
           password,
         }),
       });
-      if (!result) return; 
+      if (!result) return;
       // const data = await response.json();
-      const {response, data} = result;
+      const { response, data } = result;
 
       if (!response.ok) {
-        toast.error(
-          "Something went wrong",
-          DEFAULT_TOAST_OPTIONS,
-        );
+        toast.error("Something went wrong", DEFAULT_TOAST_OPTIONS);
+        return;
+      }
+      if (!data) {
+        toast.error("No data", DEFAULT_TOAST_OPTIONS);
         return;
       }
 
-      localStorage.setItem("loggedInUser", JSON.stringify(data?.user.email));
-      localStorage.setItem("token", JSON.stringify(data?.token));
-      setUser(data?.user);
+      const userData = data.user;
+      localStorage.setItem("loggedInUser", JSON.stringify(userData));
+      localStorage.setItem("token", data.token ?? "");
+      setUser(userData);
 
       setEmail("");
       setPassword("");
