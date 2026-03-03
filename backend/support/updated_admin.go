@@ -37,8 +37,15 @@ func UpdatedByAdmin(collection *gocb.Collection, cluster *gocb.Cluster, broker *
 		var tickets constants.Issue
 		if err == nil && res.Next() {
 			res.Row(&tickets)
-			broker.Broadcast(constants.UPDATE, tickets)
-			broker.NotifyUser(tickets.Email, constants.UPDATE, tickets)
+
+			// 1. Update the Map AND Broadcast in one go
+			broker.UpdateInternalState(constants.TicketEvent{
+				Action: constants.UPDATE,
+				Ticket: tickets,
+			})
+
+			// 2. Notify the specific user channel
+			broker.NotifyUser(tickets.Email, string(constants.UPDATE), tickets)
 		}
 
 		if err != nil {

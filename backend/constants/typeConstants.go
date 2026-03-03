@@ -32,12 +32,13 @@ type UpdateAdmin struct {
 }
 
 type TicketEvent struct {
-	Action string `json:"action"` // "CREATE", "UPDATE", "DELETE"
+	Action Action `json:"action"` // "CREATE", "UPDATE", "DELETE"
 	Ticket Issue  `json:"ticket"`
 }
 
 type Broker struct {
-	Admins map[chan TicketEvent]bool
-	Users  map[string]map[chan TicketEvent]bool
-	Mu     sync.Mutex
+	Mu            sync.RWMutex
+	ActiveTickets map[string]Issue
+	Admins        map[chan TicketEvent]bool
+	Users         map[string]map[chan TicketEvent]bool
 }

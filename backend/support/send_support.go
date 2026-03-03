@@ -49,6 +49,10 @@ func SendSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc {
 		json.NewEncoder(w).Encode(map[string]string{
 			"message": "Your issue has been successfully submitted. Stay tuned for updates!",
 		})
-		broker.Broadcast(constants.CREATE, issue)
+		// broker.Broadcast(string(constants.CREATE), issue)
+		broker.UpdateInternalState(constants.TicketEvent{
+            Action: constants.CREATE,
+            Ticket: issue,
+        })
 	}
 }

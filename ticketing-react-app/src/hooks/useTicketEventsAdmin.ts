@@ -1,39 +1,40 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { CRUD } from "../Contants/constants";
 import type { Ticket } from "../Contants/interfaceConstants";
 
 export const useTicketEventsAdmin = (endpoint: string) => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loadingState, setLoadingState] = useState(true);
+  // Use an Object/Record instead of an Array
+  const [tickets, setTickets] = useState<Record<string, Ticket>>({});
 
   useEffect(() => {
     const eventSource = new EventSource(endpoint);
 
-    eventSource.onopen = () => setLoadingState(false);
-
     eventSource.onmessage = (event) => {
       const { action, ticket } = JSON.parse(event.data);
-      setTickets((prev) => {
-        switch (action) {
-          case CRUD.Create:
-            return prev.find(t => t.id === ticket.id) ? prev : [ticket, ...prev];
-          case CRUD.Delete:
-            return prev.filter(t => t.id !== ticket.id);
-          case CRUD.Update:
-            return prev.map(t => t.id === ticket.id ? { ...t, ...ticket } : t);
-          default:
-            return prev;
-        }
-      });
-    };
 
-    eventSource.onerror = () => {
-      eventSource.close();
-      setLoadingState(false);
+      setTickets((prev) => {
+        if (action === CRUD.Delete) {
+          const newState = { ...prev };
+          delete newState[ticket.id];
+          return newState;
+        }
+
+        // Instant update: No iteration, no .map(), no .find()
+        // This handles both Create and Update
+        return {
+          ...prev,
+          [ticket.id]: ticket,
+        };
+      });
     };
 
     return () => eventSource.close();
   }, [endpoint]);
 
-  return { tickets, setTickets, loadingState };
+  // Convert to array only when RENDERING (or use the object directly)
+  const ticketList = useMemo(() => Object.values(tickets), [tickets]);
+  // Sort them by ID or Date here if needed, since Objects don't guarantee order
+  const sortedList = useMemo(() => ticketList.sort((a, b) => b.id.localeCompare(a.id)), [ticketList]);
+
+  return { tickets: sortedList, setTickets };
 };

@@ -3,16 +3,23 @@ import AdminModal from "../UserSide/Modals/AdminModal";
 import { IoSearchSharp } from "react-icons/io5";
 import { APIEndpoints } from "../../Contants/routes";
 import { useTicketEventsAdmin } from "../../hooks/useTicketEventsAdmin";
+import type { Ticket } from "../../Contants/interfaceConstants";
 
 const AdminPage = () => {
-  const { tickets, setTickets, loadingState } = useTicketEventsAdmin(APIEndpoints.AdminGetAllTicketsEndpoint);
+  const { tickets, setTickets } = useTicketEventsAdmin(
+    APIEndpoints.AdminGetAllTicketsEndpoint,
+  );
   const [ticketSelected, setTicketSelected] = useState<string | null>(null);
   const [modalOpen, setModalOpen] = useState(false);
 
   const refreshAfterResolve = (resolvedId: string) => {
-    setTickets((prev) => prev.filter((t) => t.id != resolvedId));
+    // Since setTickets now expects a Record/Object:
+    setTickets((prev: Record<string, Ticket>) => {
+      const newState = { ...prev };
+      delete newState[resolvedId];
+      return newState;
+    });
   };
-
   // const getHistory = async () => {
   //   try {
   //     const endpoint = "http://localhost:8080/fetch-all-tickets";
@@ -58,8 +65,8 @@ const AdminPage = () => {
   //   };
   // }, []);
 
-  if (loadingState)
-    return <div className="text-center mt-10">Loading history...</div>;
+  // if (loadingState)
+  //   return <div className="text-center mt-10">Loading history...</div>;
   return (
     <>
       <div className="max-w-4xl mx-auto mt-8 p-4">
@@ -68,9 +75,7 @@ const AdminPage = () => {
         </h2>
 
         {tickets.length === 0 ? (
-          <p className="text-gray-500 text-center">
-            No Tickets Raised
-          </p>
+          <p className="text-gray-500 text-center">No Tickets Raised</p>
         ) : (
           <div className="flex flex-col gap-4">
             {tickets.map(

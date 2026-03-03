@@ -35,6 +35,9 @@ func DeleteSupport(collection *gocb.Collection, broker *Broker) http.HandlerFunc
 			return
 		}
 
-		broker.Broadcast(constants.DELETE, constants.Issue{Id: id.DocId})
+		broker.UpdateInternalState(constants.TicketEvent{
+            Action: constants.DELETE,
+            Ticket: constants.Issue{Id: id.DocId},
+        })
 	}
 }
