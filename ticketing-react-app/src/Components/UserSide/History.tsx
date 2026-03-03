@@ -1,68 +1,68 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import EditModal from "./Modals/EditModal";
 import DeleteModal from "./Modals/DeleteModal";
 import { CiTimer } from "react-icons/ci";
 import { MdDone } from "react-icons/md";
-import { FaTrash, FaPen } from "react-icons/fa";
+import { FaTrash, FaPen, FaRegEye } from "react-icons/fa";
 import ResolvedModal from "./Modals/ResolvedModal";
-import { toast } from "react-toastify";
-import { IoSearchSharp } from "react-icons/io5";
-import { EventSourcePolyfill } from "event-source-polyfill";
-import { DEFAULT_TOAST_OPTIONS } from "../../Contants/toastConstant";
-import { CRUD } from "../../Contants/constants";
 import { FetchUserHistoryEndpoint } from "../../Contants/routes";
 import type { Ticket } from "../../Contants/interfaceConstants";
+import { useTicketEventsUser } from "../../hooks/useTicketEventsUser";
 
 const History = () => {
-  const [tickets, setTickets] = useState<Ticket[]>([]);
-  const [loadingState, setLoadingState] = useState(true);
+  // const [tickets, setTickets] = useState<Ticket[]>([]);
+  // const [loadingState, setLoadingState] = useState(true);
+  const email = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+  const { tickets, loading, setTickets } = useTicketEventsUser(
+    FetchUserHistoryEndpoint(email),
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedTicketId, setSelectedTicketId] = useState("");
   const [viewModal, setViewModal] = useState(false);
 
-  useEffect(() => {
-    const email = JSON.parse(localStorage.getItem("loggedInUser") || "null");
-    const endpoint = FetchUserHistoryEndpoint(email);
-    const eventSource = new EventSourcePolyfill(endpoint, {
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
+  // useEffect(() => {
+  //   const email = JSON.parse(localStorage.getItem("loggedInUser") || "null");
+  //   const endpoint = FetchUserHistoryEndpoint(email);
+  //   const eventSource = new EventSourcePolyfill(endpoint, {
+  //     headers: {
+  //       Authorization: `Bearer ${localStorage.getItem("token")}`,
+  //     },
+  //   });
 
-    eventSource.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        const { action, ticket } = data;
-        setTickets((prev) => {
-          if (!ticket.id) return prev;
-          if (action === CRUD.Create) {
-            const duplicate = prev.find((t) => t.id === ticket.id);
-            if (duplicate) return prev;
-            return [ticket, ...prev];
-          } else if (action === CRUD.Update) {
-            return prev.map((t) => (t.id === ticket.id ? ticket : t));
-          }
-          return prev;
-        });
-      } catch {
-        toast.error("Parse error", DEFAULT_TOAST_OPTIONS);
-      }
-    };
+  //   eventSource.onmessage = (event) => {
+  //     try {
+  //       const data = JSON.parse(event.data);
+  //       const { action, ticket } = data;
+  //       setTickets((prev) => {
+  //         if (!ticket.id) return prev;
+  //         if (action === CRUD.Create) {
+  //           const duplicate = prev.find((t) => t.id === ticket.id);
+  //           if (duplicate) return prev;
+  //           return [ticket, ...prev];
+  //         } else if (action === CRUD.Update) {
+  //           return prev.map((t) => (t.id === ticket.id ? ticket : t));
+  //         }
+  //         return prev;
+  //       });
+  //     } catch {
+  //       toast.error("Parse error", DEFAULT_TOAST_OPTIONS);
+  //     }
+  //   };
 
-    eventSource.onopen = () => {
-      setLoadingState(false);
-    };
+  //   eventSource.onopen = () => {
+  //     setLoadingState(false);
+  //   };
 
-    eventSource.onerror = () => {
-      eventSource.close();
-      setLoadingState(false);
-    };
+  //   eventSource.onerror = () => {
+  //     eventSource.close();
+  //     setLoadingState(false);
+  //   };
 
-    return () => {
-      eventSource.close();
-    };
-  }, []); // Only re-runs if the email actually changes
+  //   return () => {
+  //     eventSource.close();
+  //   };
+  // }, []); // Only re-runs if the email actually changes
 
   // const getHistory = () => {
   // removed async since sse is even based
@@ -86,18 +86,27 @@ const History = () => {
   // };
 
   const handleUpdate = (newDesc: string) => {
-    setTickets((prev) =>
-      prev.map((t) =>
-        t.id === selectedTicketId ? { ...t, description: newDesc } : t,
-      ),
-    );
+    setTickets((prev: Record<string, Ticket>) => {
+      const existing = prev[selectedTicketId];
+      if (!existing) return prev;
+
+      // Direct key update, no iteration
+      return {
+        ...prev,
+        [selectedTicketId]: { ...existing, description: newDesc },
+      };
+    });
   };
 
   const refreshAfterDelete = (deletedId: string) => {
-    setTickets((prev) => prev.filter((t) => t.id != deletedId));
+    setTickets((prev: Record<string, Ticket>) => {
+      const newState = { ...prev };
+      delete newState[deletedId]; // Instant deletion
+      return newState;
+    });
   };
 
-  if (loadingState)
+  if (loading)
     return <div className="text-center mt-10">Loading history...</div>;
   return (
     <>
@@ -106,11 +115,11 @@ const History = () => {
           Support History
         </h2>
 
-        {tickets.length === 0 ? (
+        {Object.keys(tickets).length === 0 ? (
           <p className="text-gray-500 text-center">No history found.</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {tickets.map((ticket) =>
+            {Object.values(tickets).map((ticket) =>
               ticket.state === "Pending..." ? (
                 <div
                   key={ticket.id}
@@ -180,7 +189,7 @@ const History = () => {
                         : ticket.message.slice(0, 97) + "..."}
                     </p>
                     <div className="flex items-center justify-between">
-                      <IoSearchSharp
+                      <FaRegEye
                         className="hover:cursor-pointer text-2xl rounded-2xl mr-2"
                         onClick={() => {
                           setViewModal(true);
