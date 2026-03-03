@@ -59,6 +59,10 @@ func main() {
 
 	r := mux.NewRouter()
 	var ticketBroker *support.Broker = support.NewBroker()
+	err = ticketBroker.Bootstrap(cluster)
+	if err != nil {
+		log.Fatal("Failed to bootstrap ticket broker:", err)
+	}
 
 	// SIGNUP
 	r.HandleFunc("/signup", signin.SignupHandler(user_collection))

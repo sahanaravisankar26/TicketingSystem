@@ -1,7 +1,9 @@
 package constants
 
+type Action string
+
 const (
-	CREATE = "CREATE"
-	UPDATE = "UPDATE"
-	DELETE = "DELETE"
+    CREATE Action = "CREATE"
+    UPDATE Action = "UPDATE"
+    DELETE Action = "DELETE"
 )

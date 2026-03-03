@@ -49,6 +49,10 @@ func UpdateSupport(collection *gocb.Collection, cluster *gocb.Cluster, broker *B
 			return
 		}
 
-		broker.Broadcast(constants.UPDATE, ticket)
+		// broker.Broadcast(string(constants.UPDATE), ticket)
+		broker.UpdateInternalState(constants.TicketEvent{
+            Action: constants.UPDATE,
+            Ticket: ticket,
+        })
 	}
 }
