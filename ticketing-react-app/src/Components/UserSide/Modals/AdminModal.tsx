@@ -20,6 +20,13 @@ const AdminModal = ({
 
   const handleUpdate = async () => {
     setIsSubmitting(true);
+    
+    if (!value.trim()) {
+      toast.error("Please provide a solution before marking as resolved", DEFAULT_TOAST_OPTIONS);
+      setIsSubmitting(false);
+      return;
+    }
+
     const resolved = "Resolved";
     setState(resolved);
     try {

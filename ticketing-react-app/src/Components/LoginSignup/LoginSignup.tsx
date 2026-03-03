@@ -26,6 +26,11 @@ const LoginSignup = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!email.trim() || !password.trim()) {
+      toast.error("Please fill in all fields", DEFAULT_TOAST_OPTIONS);
+      return;
+    }
+    
     const endpoint = isLoginMode
       ? APIEndpoints.UserLoginEndpoint
       : APIEndpoints.UserSignupEndpoint;

@@ -15,6 +15,11 @@ const SupportIssue = () => {
     e.preventDefault();
     setIsSubmitting(true);
     setSuccessMessage("");
+    if (!issue.trim() || !details.trim()) {
+      toast.error("Please fill in all fields", DEFAULT_TOAST_OPTIONS);
+      setIsSubmitting(false);
+      return;
+    }
 
     const endpoint = APIEndpoints.SubmitIssueTicketEndpoint;
 
