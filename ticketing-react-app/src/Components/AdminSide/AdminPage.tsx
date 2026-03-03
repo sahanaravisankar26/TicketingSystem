@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import AdminModal from "../UserSide/Modals/AdminModal";
-import { IoSearchSharp } from "react-icons/io5";
+import { FaRegEye } from "react-icons/fa";
 import { APIEndpoints } from "../../Contants/routes";
 import { useTicketEventsAdmin } from "../../hooks/useTicketEventsAdmin";
 import type { Ticket } from "../../Contants/interfaceConstants";
@@ -108,7 +108,7 @@ const AdminPage = () => {
                         <p className="text-xs text-gray-400 mt-1 italic">
                           Ref: {ticket.id}
                         </p>
-                        <IoSearchSharp
+                        <FaRegEye
                           className="hover:cursor-pointer text-2xl rounded-2xl"
                           onClick={() => {
                             setModalOpen(true);

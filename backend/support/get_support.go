@@ -47,33 +47,42 @@ func FetchSupport(ticket_collection *gocb.Collection, cluster *gocb.Cluster, bro
 		// 	return
 		// }
 
-		query := "SELECT id, email, issue, description, message, state FROM `tickets`._default._default WHERE email = $1 ORDER BY id DESC;"
-		res, err := cluster.Query(query, &gocb.QueryOptions{
-			PositionalParameters: []interface{}{email},
-			Adhoc:                true, // not use cached - for dynamically
-		})
+		// query := "SELECT id, email, issue, description, message, state FROM `tickets`._default._default WHERE email = $1 ORDER BY id DESC;"
+		// res, err := cluster.Query(query, &gocb.QueryOptions{
+		// 	PositionalParameters: []interface{}{email},
+		// 	Adhoc:                true, // not use cached - for dynamically
+		// })
 
-		if err != nil {
-			response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
-			return
-		}
+		// if err != nil {
+		// 	response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+		// 	return
+		// }
 
 		flusher, ok := w.(http.Flusher)
 		if !ok {
 			response.RespondWithError(w, constants.ErrStreamUnsupported, constants.StatusInternalServerError)
 			return
 		}
+		broker.Mu.RLock()
+        for _, t := range broker.ActiveTickets {
+            if t.Email == email { // Filter by user email in RAM
+                msg, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t})
+                fmt.Fprintf(w, "data: %s\n\n", msg)
+            }
+        }
+        broker.Mu.RUnlock()
+        flusher.Flush()
 
-		for res.Next() {
-			var t constants.Issue
-			if err := res.Row(&t); err != nil {
-				response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
-				return
-			}
-			ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t}) // sending existing data as create
-			fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
-			flusher.Flush()
-		}
+		// for res.Next() {
+		// 	var t constants.Issue
+		// 	if err := res.Row(&t); err != nil {
+		// 		response.RespondWithError(w, constants.ErrFailedToFetch, constants.StatusInternalServerError)
+		// 		return
+		// 	}
+		// 	ticketMarshal, _ := json.Marshal(constants.TicketEvent{Action: constants.CREATE, Ticket: t}) // sending existing data as create
+		// 	fmt.Fprintf(w, "data: %s\n\n", ticketMarshal)
+		// 	flusher.Flush()
+		// }
 
 		clientChannel := make(chan constants.TicketEvent)
 		broker.Mu.Lock()
